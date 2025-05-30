@@ -1,13 +1,5 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { sequelize } from '../database';
-
-// DOCUMENTO	varchar(20)	NO	PRI	(null)	
-// NOMBRES	varchar(60)	YES		(null)	
-// GRPVTAS_CODIGO	varchar(30)	YES		(null)	
-// CARGO	varchar(30)	YES		(null)	
-// VERSION	varchar(20)	YES		(null)	
-// NOMBRECARGO	varchar(30)	YES		(null)	
-// CCOSTO	varchar(10)	YES		(null)	
+import { sequelize } from '@infrastructure/persistence/database';
 
 export class VendedorModel extends Model<InferAttributes<VendedorModel>, InferCreationAttributes<VendedorModel>> {
   declare DOCUMENTO: string;

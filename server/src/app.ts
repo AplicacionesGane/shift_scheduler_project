@@ -1,23 +1,33 @@
+import { sequelize } from '@infrastructure/persistence/database';
 import express from 'express';
-import bodyParser from 'body-parser';
-import { json, urlencoded } from 'express';
-import routes from './presentation/routes/index';
-import errorHandler from './presentation/middleware/errorHandler';
-import { connectDatabase } from './infrastructure/persistence/database';
 
 const app = express();
 
-// Middleware
-app.use(json());
-app.use(urlencoded({ extended: true }));
+// Middleware to parse JSON bodies
+app.disable('x-powered-by')
+    .use(express.json())
+    .use(express.urlencoded({ extended: true }));
 
-// Connect to the database
-connectDatabase();
 
-// Routes
-app.use('/api', routes);
+// test route
+app.get('/', (req, res) => {
+    res.status(200).json({
+        message: 'Welcome to the API',
+        status: 'success',
+    });
+});
 
-// Error handling middleware
-app.use(errorHandler);
+// Test database connection
+sequelize.authenticate()
+    .then(() => {
+        console.log('Database connection established successfully.');
+    })
+    .catch((error) => {
+        console.error('Unable to connect to the database:', error);
+        process.exit(1); // Exit the process if the database connection fails
+    });
 
-export default app;
+// Start the server
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
+});

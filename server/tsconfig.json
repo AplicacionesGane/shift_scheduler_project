@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
@@ -19,7 +20,5 @@
       "@presentation/*": ["presentation/*"],
       "@shared/*": ["shared/*"]
     }
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  }
 }

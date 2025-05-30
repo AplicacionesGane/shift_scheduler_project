@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const mysqlSchemaEnvironments = z.object({
   MYSQL_HOST: z.string().min(1, 'MYSQL_HOST is required'),
@@ -8,5 +8,17 @@ export const mysqlSchemaEnvironments = z.object({
   MYSQL_DATABASE: z.string().min(1, 'MYSQL_DATABASE is required'),
 });
 
-const { } = mysqlSchemaEnvironments.sa
+const { success, data, error } = mysqlSchemaEnvironments.safeParse(process.env);
 
+if (!success) {
+  console.error('Invalid MySQL environment variables:', error.errors);
+  process.exit(1);
+}
+
+export const mysqlConfig = {
+  host: data.MYSQL_HOST,
+  port: data.MYSQL_PORT,
+  user: data.MYSQL_USER,
+  password: data.MYSQL_PASSWORD,
+  database: data.MYSQL_DATABASE,
+};
