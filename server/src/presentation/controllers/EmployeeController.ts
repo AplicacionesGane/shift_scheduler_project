@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CreateEmployee } from '../../application/useCases/CreateEmployee';
+import { CreateEmployee } from '../../application/VendedorUseCase';
 import { GetSchedule } from '../../application/useCases/GetSchedule';
 import { EmployeeDto } from '../dtos/EmployeeDto';
 
