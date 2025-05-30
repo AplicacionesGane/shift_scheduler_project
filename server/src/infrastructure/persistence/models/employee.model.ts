@@ -1,7 +1,7 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
 import { sequelize } from '@infrastructure/persistence/database';
 
-export class VendedorModel extends Model<InferAttributes<VendedorModel>, InferCreationAttributes<VendedorModel>> {
+export class EmployeeModel extends Model<InferAttributes<EmployeeModel>, InferCreationAttributes<EmployeeModel>> {
   declare DOCUMENTO: string;
   declare NOMBRES: string;
   declare GRPVTAS_CODIGO: string;
@@ -11,7 +11,7 @@ export class VendedorModel extends Model<InferAttributes<VendedorModel>, InferCr
   declare CCOSTO: string;
 }
 
-VendedorModel.init(
+EmployeeModel.init(
   {
     DOCUMENTO: { type: DataTypes.STRING(20), allowNull: false, primaryKey: true, },
     NOMBRES: { type: DataTypes.STRING(60), allowNull: true, },

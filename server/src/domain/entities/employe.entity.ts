@@ -1,4 +1,4 @@
-export interface VendedorEntity {
+export interface EmployeeEntity {
     documento: string;
     nombres: string;
     grpvtasCode: string;
