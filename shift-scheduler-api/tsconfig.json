@@ -9,8 +9,15 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
+
+    // modify paths to use DDD
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
+      "@domain/*": ["domain/*"],
+      "@application/*": ["application/*"],
+      "@infrastructure/*": ["infrastructure/*"],
+      "@presentation/*": ["presentation/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": ["src/**/*.ts"],
