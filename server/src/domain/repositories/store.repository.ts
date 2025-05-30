@@ -1,0 +1,5 @@
+import { StoreEntity } from '@domain/entities/store.entity'
+
+export interface StoreRepository {
+    findAll(): Promise<StoreEntity[] | null>;
+}
