@@ -1,6 +1,6 @@
 import { Employee } from '../../domain/entities/Employee';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
-import { EmployeeModel } from '../models/EmployeeModel';
+import { EmployeeModel } from '../models/VendedorModel';
 
 export class SequelizeEmployeeRepository implements EmployeeRepository {
     async create(employee: Employee): Promise<Employee> {
