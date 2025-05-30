@@ -15,7 +15,6 @@ export class EmployeeController {
         try {
             const employess = await this.employeeUseCase.findByDocument(documento)
             res.status(200).json(employess)
-            return
         } catch (error) {
             res.status(500).json({ message: 'Error on server to find all employees' })
         }
@@ -25,7 +24,6 @@ export class EmployeeController {
         try {
             const employees = await this.employeeUseCase.findAll()
             res.status(200).json(employees)
-            return
         } catch (error) {
             res.status(500).json({ message: 'Error on server to find all employees' })
         }

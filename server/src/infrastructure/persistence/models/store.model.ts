@@ -52,3 +52,5 @@ StoreModel.init(
     timestamps: false
   }
 );
+
+export { StoreModel };
