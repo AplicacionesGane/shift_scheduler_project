@@ -2,22 +2,22 @@ import { EmployeeUseCases } from '@application/employee/employe.usecases';
 import { Request, Response } from 'express';
 
 export class EmployeeController {
-    constructor(private employeeUseCase: EmployeeUseCases){}
+    constructor(private employeeUseCase: EmployeeUseCases) { }
 
     public getEmployeeByDocument = async (req: Request, res: Response) => {
-        const document = req.query;
+        const { documento } = req.params;
 
-        if(!document || typeof document !== 'string'){
+        if (!documento || typeof documento !== 'string') {
             res.status(400).json({ message: 'Document is required' })
             return
         }
 
         try {
-            const employess = await this.employeeUseCase.findByDocument(document)
+            const employess = await this.employeeUseCase.findByDocument(documento)
             res.status(200).json(employess)
             return
         } catch (error) {
-            res.status(500).json({ message: 'Error on server to find all employees'})
+            res.status(500).json({ message: 'Error on server to find all employees' })
         }
     }
 
@@ -27,7 +27,7 @@ export class EmployeeController {
             res.status(200).json(employees)
             return
         } catch (error) {
-            res.status(500).json({ message: 'Error on server to find all employees'})
+            res.status(500).json({ message: 'Error on server to find all employees' })
         }
     }
 
