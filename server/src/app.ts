@@ -1,5 +1,6 @@
 import { sequelize } from '@infrastructure/persistence/database';
 import express from 'express';
+import { routerEmploye } from './presentation/routes/employee.routes';
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.get('/', (req, res) => {
         status: 'success',
     });
 });
+
+// implement routes
+app.use('/api', routerEmploye)
 
 // Test database connection
 sequelize.authenticate()
