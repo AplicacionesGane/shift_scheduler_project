@@ -1,5 +1,8 @@
 import { routerEmploye } from './presentation/routes/employee.routes';
 import { routerStores } from './presentation/routes/stores.routes';
+import { routerMocks } from '@presentation/routes/mocks.routes';
+
+
 import { sequelize } from '@infrastructure/persistence/database';
 import express from 'express';
 
@@ -20,8 +23,9 @@ app.get('/', (req, res) => {
 });
 
 // implement routes
-app.use('/api', routerEmploye)
+app.use('/api', routerEmploye);
 app.use('/api', routerStores);
+app.use('/api', routerMocks);
 
 // Test database connection
 sequelize.authenticate()
