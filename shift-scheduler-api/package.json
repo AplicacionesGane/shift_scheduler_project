@@ -1,0 +1,36 @@
+{
+  "name": "shift-scheduler-api",
+  "version": "1.0.0",
+  "description": "API for managing employee shifts and schedules.",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun run src/app.ts",
+    "build": "tsc",
+    "migrate": "bun run sequelize db:migrate",
+    "seed": "bun run sequelize db:seed:all",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "sequelize": "^6.6.5",
+    "mysql2": "^2.2.5",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5",
+    "@types/express": "^4.17.11",
+    "@types/node": "^14.14.31",
+    "ts-node": "^10.0.0",
+    "bun": "^0.1.0"
+  },
+  "keywords": [
+    "shift",
+    "scheduler",
+    "api",
+    "employee",
+    "management"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
