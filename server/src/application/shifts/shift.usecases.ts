@@ -12,9 +12,9 @@ export class ShiftUseCases {
         return this.shiftRepo.findById(id);
     }
 
-    // async findAll(): Promise<Shift[]> {
-    //     return this.shiftRepo.findAll();
-    // }
+    async findAll(): Promise<Shift[] | null> {
+        return this.shiftRepo.findAll();
+    }
 
     // async update(id: string, shift: Partial<Shift>): Promise<Shift | null> {
     //     return this.shiftRepo.update(id, shift);

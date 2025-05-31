@@ -4,10 +4,10 @@ import { Shift } from '@/domain/entities/shift.entity';
 
 class ShiftModel extends Model<InferAttributes<ShiftModel>, InferCreationAttributes<ShiftModel>> implements Shift {
     declare id?: string | undefined;
-    declare startTime: Date;
+    declare startTime: string;
     declare idStore: string | null;
-    declare endTime: Date;
-    declare date: Date;
+    declare endTime: string;
+    declare date: string;
     declare createdAt?: Date | undefined;
     declare updatedAt?: Date | undefined;
 }
@@ -15,10 +15,10 @@ class ShiftModel extends Model<InferAttributes<ShiftModel>, InferCreationAttribu
 ShiftModel.init(
     {
         id: { type: DataTypes.STRING(36), primaryKey: true, allowNull: true },
-        startTime: { type: DataTypes.DATE, allowNull: false },
+        startTime: { type: DataTypes.STRING(36), allowNull: false },
+        endTime: { type: DataTypes.STRING(36), allowNull: false },
         idStore: { type: DataTypes.STRING(36), allowNull: true },
-        endTime: { type: DataTypes.DATE, allowNull: false },
-        date: { type: DataTypes.DATE, allowNull: false }
+        date: { type: DataTypes.STRING(10), allowNull: false }
     },
     {
         sequelize,
@@ -27,3 +27,5 @@ ShiftModel.init(
         timestamps: true
     }
 );
+
+export { ShiftModel };

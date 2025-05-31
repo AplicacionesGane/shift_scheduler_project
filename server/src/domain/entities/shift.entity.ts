@@ -1,9 +1,9 @@
 export interface Shift {
   id?: string;
-  startTime: Date;
+  startTime: string; // Formato HH:MM
+  endTime: string;   // Formato HH:MM
   idStore: string | null;
-  endTime: Date;
-  date: Date;
+  date: string; // Formato YYYY-MM-DD
   createdAt?: Date;
   updatedAt?: Date;
 }
