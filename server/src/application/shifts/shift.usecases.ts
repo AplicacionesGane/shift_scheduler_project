@@ -1,11 +1,32 @@
+import { StoreRepository } from '@/domain/repositories/store.repository';
 import { ShiftRepository } from '@domain/repositories/shift.repository';
+import { ShiftValue } from '@/domain/valueObjects/shift.value';
 import { Shift } from '@domain/entities/shift.entity';
 
-export class ShiftUseCases {
-    constructor(private readonly shiftRepo: ShiftRepository) {}
+export interface CreateShiftDTO{
+    startTime: string; 
+    endTime: string;
+    idStore: string; 
+    date: string; 
+}
 
-    async create(shift: Shift): Promise<Shift> {
-        return this.shiftRepo.create(shift);
+export class ShiftUseCases {
+    constructor(
+        private readonly shiftRepo: ShiftRepository,
+        private readonly storeRepo: StoreRepository
+    ) {}
+
+    async execute(shiftData: CreateShiftDTO): Promise<Shift> {
+        // valida que la tienda existe ANTES de crear el turno
+        if (shiftData.idStore) {
+            const store = await this.storeRepo.findById(shiftData.idStore);
+            if (!store) {
+                throw new Error(`Store with ID ${shiftData.idStore} does not exist`);
+            }
+        }
+        // Crear el ShiftValue ya validado
+        const shift = new ShiftValue(shiftData);
+        return await this.shiftRepo.save(shift);
     }
 
     async findById(id: string): Promise<Shift | null> {
@@ -15,12 +36,4 @@ export class ShiftUseCases {
     async findAll(): Promise<Shift[] | null> {
         return this.shiftRepo.findAll();
     }
-
-    // async update(id: string, shift: Partial<Shift>): Promise<Shift | null> {
-    //     return this.shiftRepo.update(id, shift);
-    // }
-
-    // async delete(id: string): Promise<boolean> {
-    //     return this.shiftRepo.delete(id);
-    // }
 }

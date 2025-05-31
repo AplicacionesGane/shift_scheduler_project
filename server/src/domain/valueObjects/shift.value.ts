@@ -5,7 +5,7 @@ export class ShiftValue implements Shift {
     id: string;
     startTime: string;
     endTime: string;
-    idStore: string | null;
+    idStore: string;
     date: string;
     createdAt: Date;
     updatedAt: Date;
