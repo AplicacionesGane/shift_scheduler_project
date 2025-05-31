@@ -1,18 +1,53 @@
-import { EmployeeRepository } from '@domain/repositories/employee.repository';
-import { EmployeeEntity } from '@domain/entities/employe.entity';
+/**
+ * ? Casos de uso para la entidad Employee.
+ * * Estos casos de uso encapsulan la lógica de negocio relacionada con los empleados,
+ * * permitiendo realizar operaciones como crear, actualizar, eliminar y consultar empleados.
+ * * Tambien permiten logica de negocio relacionada con los empleados, como validaciones y transformaciones de datos.
+ */
+
+import { EmployeeRepository } from "@/domain/repositories/employee.repository";
 
 export class EmployeeUseCases {
-    constructor(private readonly employeeRepo: EmployeeRepository) {}
+    // * Aplicamos inyección de dependencias para los repositorios necesarios
+    constructor(private readonly employeeRepo: EmployeeRepository){}
 
-    async findByDocument(document: string): Promise<EmployeeEntity | null> {
-        return this.employeeRepo.findById(document);
+    public employeeById = async (document: string) => {
+        try {
+            const employee = await this.employeeRepo.findEmployeeById(document);
+            if (!employee) {
+                throw new Error(`Employee with document ${document} not found`);
+            }
+            return employee;
+        } catch (error) {
+            console.error(error);
+            return null; // O manejar el error de otra manera según la lógica de negocio
+        }
     }
 
-    async findAll(): Promise<EmployeeEntity[] | null> {
-        return this.employeeRepo.findAll();
+    public allEmployees = async () => {
+        try {
+            const employees = await this.employeeRepo.findAllEmployees();
+            if (!employees || employees.length === 0) {
+                throw new Error('No employees found');
+            }
+            return employees;
+        } catch (error) {
+            console.error(error);
+            return null; // O manejar el error de otra manera según la lógica de negocio
+        }
     }
 
-    async findAllByCargo(cargo: string): Promise<EmployeeEntity[] | null> {
-        return this.employeeRepo.findByCargo(cargo);
+    public employeesByCargo = async (cargo: string) => {
+        try {
+            const employees = await this.employeeRepo.findAllEmployeesByCargo(cargo);
+            if (!employees || employees.length === 0) {
+                throw new Error(`No employees found for cargo ${cargo}`);
+            }
+            return employees;
+        } catch (error) {
+            console.error(error);
+            return null; // O manejar el error de otra manera según la lógica de negocio
+        }
     }
+    
 }

@@ -11,20 +11,18 @@ export class EmployeeModel extends Model<InferAttributes<EmployeeModel>, InferCr
   declare CCOSTO: string;
 }
 
-EmployeeModel.init(
-  {
-    DOCUMENTO: { type: DataTypes.STRING(20), allowNull: false, primaryKey: true, },
-    NOMBRES: { type: DataTypes.STRING(60), allowNull: true, },
-    GRPVTAS_CODIGO: { type: DataTypes.STRING(30), allowNull: true, },
-    CARGO: { type: DataTypes.STRING(30), allowNull: true, },
-    VERSION: { type: DataTypes.STRING(20), allowNull: true, },
-    NOMBRECARGO: { type: DataTypes.STRING(30), allowNull: true, },
-    CCOSTO: { type: DataTypes.STRING(10), allowNull: true, },
-  },
-  {
-    sequelize,
-    modelName: 'Vendedor',
-    tableName: 'VENDEDORES',
-    timestamps: false,
-  }
+EmployeeModel.init({
+  DOCUMENTO: { type: DataTypes.STRING(20), allowNull: false, primaryKey: true, },
+  NOMBRES: { type: DataTypes.STRING(60), allowNull: true, },
+  GRPVTAS_CODIGO: { type: DataTypes.STRING(30), allowNull: true, },
+  CARGO: { type: DataTypes.STRING(30), allowNull: true, },
+  VERSION: { type: DataTypes.STRING(20), allowNull: true, },
+  NOMBRECARGO: { type: DataTypes.STRING(30), allowNull: true, },
+  CCOSTO: { type: DataTypes.STRING(10), allowNull: true, },
+}, {
+  sequelize,
+  modelName: 'Vendedor',
+  tableName: 'VENDEDORES',
+  timestamps: false,
+}
 );

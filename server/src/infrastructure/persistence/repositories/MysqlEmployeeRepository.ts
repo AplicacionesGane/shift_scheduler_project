@@ -1,93 +1,70 @@
 import { EmployeeModel } from '@infrastructure/persistence/models/employee.model';
-import { EmployeeRepository } from '@domain/repositories/employee.repository';
-import { EmployeeEntity } from '@domain/entities/employe.entity';
+
+import { EmployeeRepository } from "@/domain/repositories/employee.repository";
+import { EmployeeEntity } from "@/domain/entities/employe.entity";
 
 export class MysqlEmployeeRepository implements EmployeeRepository {
 
-    findById = async (document: string): Promise<EmployeeEntity | null> => {
-        try {
-            const employe = await EmployeeModel.findOne({ where: { DOCUMENTO: document } })
+  findEmployeeById = async (document: string): Promise<EmployeeEntity | null> => {
+    try {
+      const employee = await EmployeeModel.findByPk(document)
 
-            if (!employe || !employe.dataValues) return null
+      if (!employee) return null;
 
-            const mapEmployee: EmployeeEntity = {
-                nombres: employe.dataValues.DOCUMENTO,
-                documento: employe.dataValues.DOCUMENTO,
-                cargo: employe.dataValues.CARGO,
-                ccosto: employe.dataValues.CCOSTO,
-                grpvtasCode: employe.dataValues.GRPVTAS_CODIGO,
-                nameCargo: employe.dataValues.NOMBRECARGO
-            }
+      const employeeData: EmployeeEntity = {
+        documento: employee.dataValues.DOCUMENTO,
+        nombres: employee.dataValues.NOMBRES,
+        nameCargo: employee.dataValues.NOMBRECARGO,
+      }
 
-            return mapEmployee
-
-        } catch (error) {
-            if (error) {
-                console.log(error);
-                return null
-            }
-
-            return null
-        }
+      return employeeData;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
+  }
 
-    findAll = async (): Promise<EmployeeEntity[] | null> => {
-        try {
-            await EmployeeModel.sync()
-            const employess = await EmployeeModel.findAll()
+  findAllEmployees = async (): Promise<EmployeeEntity[] | null> => {
+    try {
+      const employees = await EmployeeModel.findAll({
+        order: [['nombres', 'ASC']]
+      });
 
-            if (!employess) return null
+      if (!employees || employees.length === 0) return null;
 
-            const mapEmployees: EmployeeEntity[] = employess.map((emp) => {
-                return {
-                    nombres: emp.dataValues.DOCUMENTO,
-                    documento: emp.dataValues.DOCUMENTO,
-                    cargo: emp.dataValues.CARGO,
-                    ccosto: emp.dataValues.CCOSTO,
-                    grpvtasCode: emp.dataValues.GRPVTAS_CODIGO,
-                    nameCargo: emp.dataValues.NOMBRECARGO
-                }
-            })
+      const employeeData: EmployeeEntity[] = employees.map(employee => ({
+        documento: employee.dataValues.DOCUMENTO,
+        nombres: employee.dataValues.NOMBRES,
+        nameCargo: employee.dataValues.NOMBRECARGO,
+      }));
 
-            return mapEmployees
-
-        } catch (error) {
-            if (error) {
-                console.log(error);
-                return null
-            }
-
-            return null
-        }
+      return employeeData;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
+  }
 
-    findByCargo = async (cargo: string): Promise<EmployeeEntity[] | null> => {
-        try {
-            const employes = await EmployeeModel.findAll({ where: { CARGO: cargo } })
+  findAllEmployeesByCargo = async (cargo: string): Promise<EmployeeEntity[] | null> => {
+    try {
+      const employees = await EmployeeModel.findAll({
+        where: { CARGO: cargo },
+        order: [['nombres', 'ASC']]
+      });
 
-            if (!employes) return null
+      if (!employees || employees.length === 0) return null;
 
-            const mapEmployees: EmployeeEntity[] = employes.map((emp) => {
-                return {
-                    nombres: emp.dataValues.DOCUMENTO,
-                    documento: emp.dataValues.DOCUMENTO,
-                    cargo: emp.dataValues.CARGO,
-                    ccosto: emp.dataValues.CCOSTO,
-                    grpvtasCode: emp.dataValues.GRPVTAS_CODIGO,
-                    nameCargo: emp.dataValues.NOMBRECARGO
-                }
-            })
+      const employeeData: EmployeeEntity[] = employees.map(employee => ({
+        documento: employee.dataValues.DOCUMENTO,
+        nombres: employee.dataValues.NOMBRES,
+        nameCargo: employee.dataValues.NOMBRECARGO,
+      }));
 
-            return mapEmployees
-
-        } catch (error) {
-            if (error) {
-                console.log(error);
-                return null
-            }
-
-            return null
-        }
+      return employeeData;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
+  }
 
 }

@@ -28,6 +28,6 @@ const controllers = new EmployeeController(usecases);
  */
 
 routerEmploye.get('/employees', controllers.getAllEmployees)
-routerEmploye.get('/employees/:documento', controllers.getEmployeeByDocument)
+routerEmploye.get('/employees/:documento', controllers.getEmployeeById)
 
 export { routerEmploye }
