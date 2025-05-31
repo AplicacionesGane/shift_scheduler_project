@@ -1,6 +1,10 @@
+import { routerWorkSchedule } from './presentation/routes/workschedule.routes';
+import { routerEmploye } from './presentation/routes/employee.routes';
+import { routerStores } from './presentation/routes/stores.routes';
+
 import { sequelize } from '@infrastructure/persistence/database';
 import express from 'express';
-import { routerEmploye } from './presentation/routes/employee.routes';
+import { routerShift } from './presentation/routes/shift.routes';
 
 const app = express();
 
@@ -19,7 +23,10 @@ app.get('/', (req, res) => {
 });
 
 // implement routes
-app.use('/api', routerEmploye)
+app.use('/api', routerEmploye);
+app.use('/api', routerStores);
+app.use('/api', routerShift);
+app.use('/api', routerWorkSchedule);
 
 // Test database connection
 sequelize.authenticate()

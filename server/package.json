@@ -3,17 +3,16 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
-  
   "scripts": {
     "dev": "bun run --watch ./src/app.ts",
     "start": "bun run index.ts",
     "build": "tsc"
   },
-
   "dependencies": {
     "express": "^5.1.0",
     "mysql2": "^3.14.1",
     "sequelize": "^6.37.7",
+    "uuid": "^11.1.0",
     "zod": "^3.25.42"
   },
   "devDependencies": {

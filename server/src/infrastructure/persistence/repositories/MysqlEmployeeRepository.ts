@@ -33,6 +33,7 @@ export class MysqlEmployeeRepository implements EmployeeRepository {
 
     findAll = async (): Promise<EmployeeEntity[] | null> => {
         try {
+            await EmployeeModel.sync()
             const employess = await EmployeeModel.findAll()
 
             if (!employess) return null
