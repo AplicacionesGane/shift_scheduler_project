@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const workScheduleSchema = z.object({
-    employeeDocument: z.string().min(1, 'Employee document is required'),
+    employee: z.string().min(1, 'Employee document is required'),
     shiftId: z.string().min(1, 'Shift ID is required'),
     storeId: z.string().min(1, 'Store ID is required'),
     assignedDate: z.string().refine(date => !isNaN(Date.parse(date)), {

@@ -2,9 +2,9 @@ import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } 
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 import { sequelize } from '@infrastructure/persistence/database';
 
-class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferCreationAttributes<WorkScheduleModel>> implements WorkSchedule {
+class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferCreationAttributes<WorkScheduleModel>>  {
     declare id?: string;
-    declare employeeDocument: string;
+    declare employee: string;
     declare shiftId: string;
     declare storeId: string;
     declare assignedDate: string;
@@ -15,7 +15,7 @@ class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferC
 
 WorkScheduleModel.init({
     id: { type: DataTypes.STRING(36), primaryKey: true, allowNull: false },
-    employeeDocument: { type: DataTypes.STRING(20), allowNull: false },
+    employee: { type: DataTypes.STRING(20), allowNull: false },
     shiftId: { type: DataTypes.STRING(36), allowNull: false },
     storeId: { type: DataTypes.STRING(10), allowNull: false },
     assignedDate: { type: DataTypes.DATEONLY, allowNull: false },
