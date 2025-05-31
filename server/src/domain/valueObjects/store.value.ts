@@ -1,45 +1,45 @@
 import type { StoreEntity } from '@domain/entities/store.entity';
 
+export interface StoreValueDTO {
+    empresa: string;
+    sucursal: string;
+    nombre: string;
+    direccion: string;
+    estado?: 'A' | 'I'
+}
+
 export class StoreValue implements StoreEntity {
     readonly empresa: string;
-    readonly ccosto: string;
     readonly sucursal: string;
     readonly nombre: string;
     readonly direccion: string;
-    readonly tipo: string;
-    readonly dispositivo: string;
-    readonly supervisor: string;
-    readonly canal: string;
-    readonly categoria: string;
-    readonly horaEntrada: string | null;
-    readonly horaSalida: string | null;
-    readonly horaEntradaFes: string | null;
-    readonly horaSalidaFes: string | null;
-    readonly subzona: string | null;
-    readonly celula: string | null;
-    readonly horasOrdinarias: number | null;
-    readonly horasFestivas: number | null;
-    readonly estado: string | null;
+    readonly estado: string
 
-    constructor(store: StoreEntity) {
-        this.empresa = store.empresa;
-        this.ccosto = store.ccosto;
-        this.sucursal = store.sucursal;
-        this.nombre = store.nombre;
-        this.direccion = store.direccion;
-        this.tipo = store.tipo;
-        this.dispositivo = store.dispositivo;
-        this.supervisor = store.supervisor;
-        this.canal = store.canal;
-        this.categoria = store.categoria;
-        this.horaEntrada = store.horaEntrada;
-        this.horaSalida = store.horaSalida;
-        this.horaEntradaFes = store.horaEntradaFes;
-        this.horaSalidaFes = store.horaSalidaFes;
-        this.subzona = store.subzona;
-        this.celula = store.celula;
-        this.horasOrdinarias = store.horasOrdinarias;
-        this.horasFestivas = store.horasFestivas;
-        this.estado = store.estado;
+    constructor(dto: StoreValueDTO) {
+        // Validaciones opcionales
+        if (!dto.sucursal?.trim()) {
+            throw new Error('Sucursal es requerida');
+        }
+        if (!dto.nombre?.trim()) {
+            throw new Error('Nombre es requerido');
+        }
+        if (!dto.direccion?.trim()) {
+            throw new Error('Dirección es requerida');
+        }
+        if (!dto.estado) {
+            throw new Error('Estado es requerido');
+        }
+
+        this.empresa = dto.empresa.trim();
+        this.sucursal = dto.sucursal.trim();
+        this.nombre = dto.nombre.trim();
+        this.direccion = dto.direccion.trim();
+        this.estado = dto.estado;
     }
+
+    // Método factory opcional para mayor claridad
+    static create(dto: StoreValueDTO): StoreValue {
+        return new StoreValue(dto);
+    }
+
 }

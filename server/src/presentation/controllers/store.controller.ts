@@ -6,7 +6,7 @@ export class StoreController {
     
     public getAllStores = async (req: Request, res: Response) => {
         try {
-            const stores = await this.storeUseCases.findAll();
+            const stores = await this.storeUseCases.findAllStores();
             res.status(200).json(stores);
         } catch (error) {
             console.log(error);
@@ -17,10 +17,10 @@ export class StoreController {
     public getStoreById = async (req: Request, res: Response) => {
         const { id } = req.params;
         try {
-            const store = await this.storeUseCases.findById(id);
+            const store = await this.storeUseCases.findStoreById(id);
             if (!store) {
                 res.status(404).json({ message: 'Store not found' });
-                return 
+                return;
             }
             res.status(200).json(store);
         } catch (error) {
