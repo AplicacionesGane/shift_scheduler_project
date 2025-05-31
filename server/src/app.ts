@@ -3,15 +3,18 @@ import { routerEmploye } from './presentation/routes/employee.routes';
 import { routerStores } from './presentation/routes/stores.routes';
 import { routerShift } from './presentation/routes/shift.routes';
 
-import { sequelize } from '@infrastructure/persistence/database';
 import { SimpleLogger } from '@/presentation/middleware/simple-logger.middleware';
+import { sequelize } from '@infrastructure/persistence/database';
+
 import express from 'express';
+import cors from 'cors';
 
 const app = express();
 
 // Middleware to parse JSON bodies
 app.disable('x-powered-by')
     .use(express.json())
+    .use(cors())
     .use(express.urlencoded({ extended: true }));
 
 // Logger middleware

@@ -24,7 +24,7 @@ export class WorkScheduleUseCases {
 
     // TODO creacion y asinación de turnos a empleados
 
-    async assignShift(workScheduleData: createWorkScheduleDTO): Promise<WorkSchedule> {
+    assignShift = async (workScheduleData: createWorkScheduleDTO): Promise<WorkSchedule> => {
         // Validar que el empleado existe
         const employee = await this.employeeRepo.findById(workScheduleData.employeeDocument);
 
@@ -51,14 +51,14 @@ export class WorkScheduleUseCases {
     }
 
     // TODO consultas todos los turnos asignados a empleados
-    async findAll(): Promise<WorkSchedule[] | null> {
+    findAll = async():Promise<WorkSchedule[] | null> => {
         return this.workScheduleRepo.findAll();
     }
 
     // TODO creacion y asinación de turnos a empleados
     // * Esta implementacion debe mejorarse para que sea mas generica y reutilizable
     
-    async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
+    findByEmployeeAndDate = async (employeeDocument: string, date: string): Promise<WorkSchedule | null> => {
         // Si el repositorio tiene método específico, usarlo
         if ('findByEmployeeAndDate' in this.workScheduleRepo) {
             return (this.workScheduleRepo as any).findByEmployeeAndDate(employeeDocument, date);
@@ -73,7 +73,7 @@ export class WorkScheduleUseCases {
         ) || null;
     }
 
-    async findSchedulesByStoreId(storeId: string): Promise<WorkSchedule[]    | null> {
+    findSchedulesByStoreId = async (storeId: string): Promise<WorkSchedule[] | null> => {
         const storeSchedules = await this.workScheduleRepo.findSchedulesByStoreId(storeId);
 
         if (!storeSchedules || !storeSchedules.length) return null;
