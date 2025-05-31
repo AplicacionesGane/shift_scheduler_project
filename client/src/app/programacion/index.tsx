@@ -74,20 +74,17 @@ export default function Programacion() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Programación de Turnos</CardTitle>
-        </CardHeader>
+      <Card className="p-2">
         <CardContent>
           <form onSubmit={handleFetchData} className="flex items-center justify-around gap-4 ">
             {/* Selector de Mes y Año */}
 
-            <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Año</label>
               <Input type="text" className="w-20" disabled value={yearActual} />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Mes</label>
               <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
                 <SelectTrigger>
@@ -103,7 +100,7 @@ export default function Programacion() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Tienda</label>
               <Input value={storeId || ""} onChange={(e) => setStoreId(e.target.value)} placeholder="Ingrese ID de tienda" />
             </div>
