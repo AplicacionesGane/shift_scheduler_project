@@ -6,6 +6,7 @@ export class MysqlStoreRepository implements StoreRepository {
 
     findAll = async (): Promise<StoreEntity[] | null> => {
         try {
+            await StoreModel.sync();
             const stores = await StoreModel.findAll();
 
             if (!stores) return null;

@@ -1,0 +1,12 @@
+-- Insertar 10 sucursales con datos inventados
+INSERT INTO SUCURSALES (ZONA, CCOSTO, CODIGO, NOMBRE, DIRECCION, TIPO, DISPOSITIVO, SUPERVISOR, CANAL, CATEGORIA, HORA_ENTRADA, HORA_SALIDA, HORA_ENTRADA_FES, HORA_SALIDA_FES, SUBZONA, CELULA, HORAS_ORDINARIAS, HORAS_FESTIVAS, ESTADO) VALUES
+('NORTE', '001', 'SUC001', 'Centro Comercial Unicentro', 'Av. 15 #123-45 Centro', 'RETAIL', 'POS001', '34567890', 'PRESENCIAL', 'PRINCIPAL', '08:00:00', '20:00:00', '10:00:00', '18:00:00', 'NORTE-A', 'CELULA-01', 8, 6, 'A'),
+('SUR', '002', 'SUC002', 'Plaza Mayor Sur', 'Cra. 80 #25-30 Sur', 'RETAIL', 'POS002', '23456789', 'PRESENCIAL', 'SECUNDARIA', '09:00:00', '21:00:00', '11:00:00', '19:00:00', 'SUR-B', 'CELULA-02', 8, 6, 'A'),
+('CENTRO', '003', 'SUC003', 'Tienda Centro Histórico', 'Calle 52 #47-28 Centro', 'TIENDA', 'POS003', '90123456', 'PRESENCIAL', 'PRINCIPAL', '07:30:00', '19:30:00', '09:30:00', '17:30:00', 'CENTRO-A', 'CELULA-01', 8, 6, 'A'),
+('OCCIDENTE', '004', 'SUC004', 'Almacén Occidental', 'Av. 68 #45B-12 Occidente', 'ALMACEN', 'POS004', '22334455', 'PRESENCIAL', 'SECUNDARIA', '08:30:00', '18:30:00', '10:30:00', '16:30:00', 'OCCID-C', 'CELULA-03', 8, 6, 'A'),
+('ORIENTE', '005', 'SUC005', 'Punto Venta Oriental', 'Cra. 10 #30-15 Oriente', 'PUNTO_VENTA', 'POS005', '89012345', 'PRESENCIAL', 'TERCIARIA', '09:30:00', '19:00:00', '11:30:00', '17:00:00', 'ORIEN-D', 'CELULA-02', 8, 6, 'A'),
+('NORTE', '006', 'SUC006', 'Megatienda Norte Express', 'Av. 45 #67-89 Norte', 'MEGATIENDA', 'POS006', '11223344', 'PRESENCIAL', 'PRINCIPAL', '06:00:00', '22:00:00', '08:00:00', '20:00:00', 'NORTE-B', 'CELULA-04', 8, 6, 'A'),
+('SUR', '007', 'SUC007', 'Local Sur Económico', 'Calle 13 Sur #28-42', 'LOCAL', 'POS007', '44556677', 'PRESENCIAL', 'ECONOMICA', '10:00:00', '20:00:00', '12:00:00', '18:00:00', 'SUR-C', 'CELULA-03', 8, 6, 'A'),
+('CENTRO', '008', 'SUC008', 'Boutique Centro Premium', 'Zona Rosa #15-25 Centro', 'BOUTIQUE', 'POS008', '77889900', 'PRESENCIAL', 'PREMIUM', '11:00:00', '21:00:00', '13:00:00', '19:00:00', 'CENTRO-B', 'CELULA-05', 8, 6, 'A'),
+('OCCIDENTE', '009', 'SUC009', 'Express Occidente 24h', 'Av. 80 #12-34 Occidente', 'EXPRESS', 'POS009', '20212223', 'PRESENCIAL', 'EXPRESS', '00:00:00', '23:59:00', '06:00:00', '18:00:00', 'OCCID-E', 'CELULA-06', 8, 6, 'A'),
+('ORIENTE', '010', 'SUC010', 'Outlet Oriental', 'Cra. 7 #85-90 Oriente', 'OUTLET', 'POS010', '40414243', 'PRESENCIAL', 'OUTLET', '08:00:00', '19:00:00', '10:00:00', '17:00:00', 'ORIEN-F', 'CELULA-04', 8, 6, 'A');
