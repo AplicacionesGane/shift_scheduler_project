@@ -9,8 +9,6 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         try {
             const newWorkSchedule = new WorkScheduleValue(workSchedule);
 
-            await WorkScheduleModel.sync();
-            
             const createdWorkSchedule = await WorkScheduleModel.create({
                 id: newWorkSchedule.id,
                 employeeDocument: newWorkSchedule.employeeDocument,
@@ -44,6 +42,8 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
 
     async findAll(): Promise<WorkSchedule[] | null> {
         try {
+            await WorkScheduleModel.sync();
+            
             const workSchedules = await WorkScheduleModel.findAll({
                 order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]
             });

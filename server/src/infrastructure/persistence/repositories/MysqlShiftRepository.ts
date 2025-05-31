@@ -29,8 +29,9 @@ export class MysqlShiftRepository implements ShiftRepository {
         }
     }
 
-    findAll(): Promise<Shift[] | null> {
+    findAll = async (): Promise<Shift[] | null> => {
         try {
+            await ShiftModel.sync();
             return ShiftModel.findAll();
         } catch (error) {
             console.error('Error finding all shifts:', error);
