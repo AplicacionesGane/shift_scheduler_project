@@ -32,8 +32,4 @@ WorkScheduleModel.init({
     }
 );
 
-WorkScheduleModel.belongsTo(EmployeeModel, { foreignKey: 'employeeDocument', targetKey: 'DOCUMENTO' });
-WorkScheduleModel.belongsTo(ShiftModel, { foreignKey: 'shiftId', targetKey: 'id' });
-WorkScheduleModel.belongsTo(StoreModel, { foreignKey: 'storeId', targetKey: 'CODIGO' });
-
 export { WorkScheduleModel };
