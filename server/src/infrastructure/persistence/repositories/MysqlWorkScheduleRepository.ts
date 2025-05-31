@@ -41,7 +41,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    findSchedulesByStoreId(id: string): Promise<WorkSchedule[] | null> {
+    findSchedulesByStoreId = async (id: string): Promise<WorkSchedule[] | null> => {
         return WorkScheduleModel.findAll({
             where: { storeId: id },
             order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]

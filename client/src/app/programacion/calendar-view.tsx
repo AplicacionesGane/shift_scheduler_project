@@ -1,5 +1,4 @@
 import { type WorkSchedule } from "@/types/Interfaces";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
 interface CalendarViewProps {
@@ -15,19 +14,16 @@ interface DaySchedule {
 }
 
 // Función para obtener el color del badge según el estado
-const getScheduleVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+const getBackgroundColor = (status: string) => {
   switch (status.toLowerCase()) {
-    case 'confirmed':
-    case 'confirmado':
-      return 'default';
-    case 'pending':
-    case 'pendiente':
-      return 'secondary';
-    case 'cancelled':
-    case 'cancelado':
-      return 'destructive';
+    case 'assigned':
+      return 'bg-green-200'; // Verde - Turno asignado
+    case 'completed':
+      return 'bg-blue-200'; // Azul - Turno completado
+    case 'absent':
+      return 'bg-red-200'; // Rojo - Ausente
     default:
-      return 'outline';
+      return 'bg-gray-200'; // Gris - Estado desconocido
   }
 };
 
@@ -56,11 +52,12 @@ export function CalendarView({ schedules, month, year }: CalendarViewProps) {
 
     // Días del mes actual
     for (let day = 1; day <= daysInMonth; day++) {
+      // Crear la fecha en formato YYYY-MM-DD para comparar directamente
+      const currentDateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
       const daySchedules = schedules.filter(schedule => {
-        const scheduleDate = new Date(schedule.assignedDate);
-        return scheduleDate.getDate() === day &&
-               scheduleDate.getMonth() === month - 1 &&
-               scheduleDate.getFullYear() === year;
+        // Comparación directa con el formato YYYY-MM-DD
+        return schedule.assignedDate === currentDateString;
       });
 
       days.push({
@@ -86,11 +83,19 @@ export function CalendarView({ schedules, month, year }: CalendarViewProps) {
   const calendarDays = getCalendarDays();
   const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
+  // Filtrar horarios para el mes y año actual para las estadísticas
+  const monthSchedules = schedules.filter(schedule => {
+    const scheduleDate = schedule.assignedDate;
+    const scheduleYear = scheduleDate.substring(0, 4);
+    const scheduleMonth = scheduleDate.substring(5, 7);
+    return scheduleYear === year.toString() && scheduleMonth === String(month).padStart(2, '0');
+  });
+
   // Estadísticas del mes
-  const totalSchedules = schedules.length;
-  const confirmedSchedules = schedules.filter(s => s.status.toLowerCase() === 'confirmed' || s.status.toLowerCase() === 'confirmado').length;
-  const pendingSchedules = schedules.filter(s => s.status.toLowerCase() === 'pending' || s.status.toLowerCase() === 'pendiente').length;
-  const cancelledSchedules = schedules.filter(s => s.status.toLowerCase() === 'cancelled' || s.status.toLowerCase() === 'cancelado').length;
+  const totalSchedules = monthSchedules.length;
+  const assignedSchedules = monthSchedules.filter(s => s.status.toLowerCase() === 'assigned').length;
+  const completedSchedules = monthSchedules.filter(s => s.status.toLowerCase() === 'completed').length;
+  const absentSchedules = monthSchedules.filter(s => s.status.toLowerCase() === 'absent').length;
 
   return (
     <div className="w-full space-y-4">
@@ -101,16 +106,16 @@ export function CalendarView({ schedules, month, year }: CalendarViewProps) {
           <div className="text-sm text-gray-600">Total turnos</div>
         </div>
         <div className="text-center">
-          <div className="font-semibold text-lg text-green-600">{confirmedSchedules}</div>
-          <div className="text-sm text-gray-600">Confirmados</div>
+          <div className="font-semibold text-lg text-green-600">{assignedSchedules}</div>
+          <div className="text-sm text-gray-600">Asignados</div>
         </div>
         <div className="text-center">
-          <div className="font-semibold text-lg text-yellow-600">{pendingSchedules}</div>
-          <div className="text-sm text-gray-600">Pendientes</div>
+          <div className="font-semibold text-lg text-blue-600">{completedSchedules}</div>
+          <div className="text-sm text-gray-600">Completados</div>
         </div>
         <div className="text-center">
-          <div className="font-semibold text-lg text-red-600">{cancelledSchedules}</div>
-          <div className="text-sm text-gray-600">Cancelados</div>
+          <div className="font-semibold text-lg text-red-600">{absentSchedules}</div>
+          <div className="text-sm text-gray-600">Ausentes</div>
         </div>
       </div>
       {/* Encabezados de días de la semana */}
@@ -130,6 +135,8 @@ export function CalendarView({ schedules, month, year }: CalendarViewProps) {
             date={day.date}
             schedules={day.schedules}
             isCurrentMonth={day.isCurrentMonth}
+            month={month}
+            year={year}
           />
         ))}
       </div>
@@ -141,17 +148,27 @@ interface CalendarDayProps {
   date: number;
   schedules: WorkSchedule[];
   isCurrentMonth: boolean;
+  month: number;
+  year: number;
 }
 
-function CalendarDay({ date, schedules, isCurrentMonth }: CalendarDayProps) {
+function CalendarDay({ date, schedules, isCurrentMonth, month, year }: CalendarDayProps) {
   const hasSchedules = schedules.length > 0;
-  const isToday = isCurrentMonth && new Date().getDate() === date && 
-                  new Date().getMonth() === new Date().getMonth() &&
-                  new Date().getFullYear() === new Date().getFullYear();
+  
+  // Verificar si es hoy
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
+  const currentYear = today.getFullYear();
+  const currentDay = today.getDate();
+  
+  const isToday = isCurrentMonth && 
+                  date === currentDay && 
+                  month === currentMonth &&
+                  year === currentYear;
 
   return (
     <Card className={`
-      min-h-[120px] p-2 transition-colors hover:shadow-md cursor-pointer
+      min-h-[160px] p-2 transition-colors hover:shadow-md cursor-pointer
       ${!isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''}
       ${isToday ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
       ${hasSchedules && isCurrentMonth ? 'bg-green-50 border-green-200' : ''}
@@ -175,15 +192,13 @@ function CalendarDay({ date, schedules, isCurrentMonth }: CalendarDayProps) {
         <div className="space-y-1">
           {schedules.slice(0, 2).map((schedule, index) => (
             <div key={index} className="text-xs">
-              <Badge 
-                variant={getScheduleVariant(schedule.status)} 
-                className="w-full justify-start text-[10px] py-0 px-1 mb-1"
+              <article 
+                className={"border p-2 rounded-md "+ getBackgroundColor(schedule.status)}
               >
                 <div className="truncate w-full">
-                  <div className="font-medium">CC: {schedule.employeeDocument}</div>
-                  <div className="opacity-75">{schedule.status}</div>
+                  <div className="font-medium">{schedule.employeeDocument}</div>
                 </div>
-              </Badge>
+              </article>
             </div>
           ))}
           
@@ -198,7 +213,7 @@ function CalendarDay({ date, schedules, isCurrentMonth }: CalendarDayProps) {
 
       {/* Indicador cuando no hay turnos */}
       {isCurrentMonth && !hasSchedules && (
-        <div className="text-xs text-gray-400 text-center mt-8 opacity-50">
+        <div className="text-sm font-semibold text-red-600 text-center mt-8 opacity-50">
           Sin turnos
         </div>
       )}

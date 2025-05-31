@@ -26,4 +26,3 @@ export class WorkScheduleValue implements WorkSchedule {
         this.updatedAt = new Date();
     }
 }
-

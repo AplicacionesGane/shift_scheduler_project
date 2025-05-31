@@ -20,9 +20,16 @@ export default function Programacion() {
   const [data, setData] = useState<WorkSchedule[]>([]);
   const [storeId, setStoreId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
-  const [yearActual] = useState<number>(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [dateRange, setDateRange] = useState<DateRange | null>(null);
 
+  // Años disponibles (año actual, anterior y siguiente)
+  const currentYear = new Date().getFullYear();
+  const availableYears = [
+    { value: currentYear - 1, label: (currentYear - 1).toString() },
+    { value: currentYear, label: currentYear.toString() },
+    { value: currentYear + 1, label: (currentYear + 1).toString() }
+  ];
 
   // Meses del año
   const months = [
@@ -59,18 +66,18 @@ export default function Programacion() {
 
     // Calcular rango de fechas cuando cambie mes o año
   useEffect(() => {
-    const firstDay = new Date(yearActual, selectedMonth - 1, 1);
-    const lastDay = new Date(yearActual, selectedMonth, 0); // Día 0 del siguiente mes = último día del mes actual
+    const firstDay = new Date(selectedYear, selectedMonth - 1, 1);
+    const lastDay = new Date(selectedYear, selectedMonth, 0); // Día 0 del siguiente mes = último día del mes actual
 
     const range: DateRange = {
       startDate: firstDay.toISOString().split('T')[0], // YYYY-MM-DD
       endDate: lastDay.toISOString().split('T')[0],
       month: selectedMonth,
-      year: yearActual
+      year: selectedYear
     };
 
     setDateRange(range);
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedYear]);
 
   return (
     <>
@@ -81,7 +88,18 @@ export default function Programacion() {
 
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Año</label>
-              <Input type="text" className="w-20" disabled value={yearActual} />
+              <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+                <SelectTrigger className="w-20">
+                  <SelectValue placeholder="Año" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableYears.map((year) => (
+                    <SelectItem key={year.value} value={year.value.toString()}>
+                      {year.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center gap-2">
@@ -113,7 +131,7 @@ export default function Programacion() {
                 <Label className="flex flex-col text-sm font-medium">
                   <p className="text-sm text-gray-600">
                     <span>Período seleccionado: </span>
-                    ({new Date(yearActual, selectedMonth, 0).getDate()} días)
+                    ({new Date(selectedYear, selectedMonth, 0).getDate()} días)
                   </p>
                   <strong>{dateRange.startDate} al {dateRange.endDate}</strong>
                 </Label>
@@ -131,7 +149,7 @@ export default function Programacion() {
       {data.length > 0 && dateRange && (
         <Card>
           <CardHeader>
-            <CardTitle>Calendario de Turnos - {months.find(m => m.value === selectedMonth)?.label} {yearActual}</CardTitle>
+            <CardTitle>Calendario de Turnos - {months.find(m => m.value === selectedMonth)?.label} {selectedYear}</CardTitle>
             <p className="text-sm text-gray-600">
               Se encontraron {data.length} turnos programados
             </p>
@@ -140,7 +158,7 @@ export default function Programacion() {
             <CalendarView
               schedules={data}
               month={selectedMonth}
-              year={yearActual}
+              year={selectedYear}
             />
           </CardContent>
         </Card>
