@@ -1,26 +1,24 @@
 import { WorkScheduleModel } from '@infrastructure/persistence/models/workschedule.model';
-import { WorkScheduleValue } from '@domain/valueObjects/workschedule.value';
 import { WorkScheduleRepository } from '@domain/repositories/workschedule.repository';
+import { WorkScheduleValue } from '@domain/valueObjects/workschedule.value';
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 
 export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
 
-    async create(workSchedule: Omit<WorkSchedule, "id" | "createdAt" | "updatedAt">): Promise<WorkSchedule> {
+    create = async (workSchedule: WorkSchedule): Promise<WorkSchedule> => {
         try {
-            const newWorkSchedule = new WorkScheduleValue(workSchedule);
+            await WorkScheduleModel.sync();
 
-            const createdWorkSchedule = await WorkScheduleModel.create({
-                id: newWorkSchedule.id,
-                employeeDocument: newWorkSchedule.employeeDocument,
-                shiftId: newWorkSchedule.shiftId,
-                storeId: newWorkSchedule.storeId,
-                assignedDate: newWorkSchedule.assignedDate,
-                status: newWorkSchedule.status,
-                createdAt: newWorkSchedule.createdAt,
-                updatedAt: newWorkSchedule.updatedAt
+            const createdWorkSchedule = await WorkScheduleModel.create(workSchedule);
+
+            return new WorkScheduleValue({
+                employeeDocument: createdWorkSchedule.employeeDocument,
+                shiftId: createdWorkSchedule.shiftId,
+                storeId: createdWorkSchedule.storeId,
+                assignedDate: createdWorkSchedule.assignedDate,
+                status: createdWorkSchedule.status
             });
 
-            return createdWorkSchedule.toJSON() as WorkSchedule;
         } catch (error) {
             console.error('Error creating work schedule:', error);
             throw new Error('Error creating work schedule');
@@ -43,7 +41,6 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
     async findAll(): Promise<WorkSchedule[] | null> {
         try {
             await WorkScheduleModel.sync();
-            
             const workSchedules = await WorkScheduleModel.findAll({
                 order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]
             });

@@ -2,7 +2,16 @@ import { WorkScheduleRepository } from '@domain/repositories/workschedule.reposi
 import { EmployeeRepository } from '@domain/repositories/employee.repository';
 import { ShiftRepository } from '@domain/repositories/shift.repository';
 import { StoreRepository } from '@domain/repositories/store.repository';
+import { WorkScheduleValue } from '@domain/valueObjects/workschedule.value';
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
+
+export interface createWorkScheduleDTO {
+    employeeDocument: string; // FK a Employee
+    shiftId: string;          // FK a Shift
+    storeId: string;         // FK a Store
+    assignedDate: string;    // YYYY-MM-DD
+    status: 'assigned' | 'completed' | 'absent';
+}
 
 export class WorkScheduleUseCases {
     constructor(
@@ -15,29 +24,30 @@ export class WorkScheduleUseCases {
     /**
      * Crear una nueva asignación de turno
      */
-    async assignShift(workScheduleData: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>): Promise<WorkSchedule> {
+    async assignShift(workScheduleData: createWorkScheduleDTO): Promise<WorkSchedule> {
         // Validar que el empleado existe
         const employee = await this.employeeRepo.findById(workScheduleData.employeeDocument);
-        if (!employee) {
-            throw new Error(`Employee with document ${workScheduleData.employeeDocument} not found`);
-        }
 
-        // Validar que el turno existe
+        if (!employee) throw new Error(`Employee with document ${workScheduleData.employeeDocument} not found or not exist`);
+
         const shift = await this.shiftRepo.findById(workScheduleData.shiftId);
-        if (!shift) {
-            throw new Error(`Shift with id ${workScheduleData.shiftId} not found`);
-        }
+        if (!shift) throw new Error(`Shift with id ${workScheduleData.shiftId} not found`);
+
+        // validar que la tienda existe
+        const store = await this.storeRepo.findById(workScheduleData.storeId);
+        if (!store) throw new Error(`Store with id ${workScheduleData.storeId} not found`);
 
         // Validar que no exista ya una asignación para ese empleado en esa fecha
         const existingAssignment = await this.findByEmployeeAndDate(
             workScheduleData.employeeDocument, 
             workScheduleData.assignedDate
         );
+
         if (existingAssignment) {
             throw new Error(`Employee ${workScheduleData.employeeDocument} already has an assignment on ${workScheduleData.assignedDate}`);
         }
 
-        return this.workScheduleRepo.create(workScheduleData);
+        return this.workScheduleRepo.create(new WorkScheduleValue(workScheduleData));
     }
 
     /**
@@ -76,6 +86,7 @@ export class WorkScheduleUseCases {
 
     /**
      * Obtener asignación específica de un empleado en una fecha
+     * TODO: Revisar si el repositorio tiene un método específico para esto
      */
     async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
         // Si el repositorio tiene método específico, usarlo

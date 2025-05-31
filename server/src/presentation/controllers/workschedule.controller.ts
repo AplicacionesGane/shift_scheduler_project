@@ -1,61 +1,35 @@
 import { WorkScheduleUseCases } from '@application/workschedule/workschedule.usecases';
 import { Request, Response } from 'express';
+import { validateWorkSchedule } from '../schemas/workScheduleSchemaValidate';
 
 export class WorkScheduleController {
-    constructor(private readonly workScheduleUseCases: WorkScheduleUseCases) {}
+    constructor(private readonly workScheduleUseCases: WorkScheduleUseCases) { }
 
     /**
      * Crear nueva asignación de turno
      * POST /work-schedules
      */
     public createWorkSchedule = async (req: Request, res: Response) => {
-        const workScheduleData = req.body;
+        const { success, data, error } = validateWorkSchedule(req.body);
 
-        if (!workScheduleData || typeof workScheduleData !== 'object') {
-            res.status(400).json({ 
-                error: 'Work schedule data is required',
-                message: 'Please provide valid work schedule information' 
-            });
-            return;
-        }
-
-        // Validaciones básicas
-        const { employeeDocument, shiftId, storeId, assignedDate, status } = workScheduleData;
-        
-        if (!employeeDocument || !shiftId || !storeId || !assignedDate) {
-            res.status(400).json({ 
-                error: 'Missing required fields',
-                message: 'employeeDocument, shiftId, storeId, and assignedDate are required' 
-            });
+        if (!success) {
+            res.status(400).json({ message: 'Invalid shift data', error: error.format() });
             return;
         }
 
         try {
-            const createdWorkSchedule = await this.workScheduleUseCases.assignShift({
-                employeeDocument,
-                shiftId,
-                storeId,
-                assignedDate,
-                status: status || 'assigned'
-            });
+            const createdWorkSchedule = await this.workScheduleUseCases.assignShift(data);
 
             res.status(201).json({
                 message: 'Work schedule created successfully',
                 data: createdWorkSchedule
             });
-        } catch (error: any) {
-            if (error.message.includes('not found') || error.message.includes('already has an assignment')) {
-                res.status(400).json({ 
-                    error: 'Validation error',
-                    message: error.message 
-                });
-            } else {
-                console.error('Error creating work schedule:', error);
-                res.status(500).json({ 
-                    error: 'Internal server error',
-                    message: 'Error creating work schedule' 
-                });
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(400).json({ message: error.message });
+                return;
             }
+            res.status(500).json({ message: 'Error on server to create shift' })
         }
     }
 
@@ -66,11 +40,11 @@ export class WorkScheduleController {
     public getAllWorkSchedules = async (req: Request, res: Response) => {
         try {
             const workSchedules = await this.workScheduleUseCases.findAll();
-            
+
             if (!workSchedules || workSchedules.length === 0) {
-                res.status(404).json({ 
+                res.status(404).json({
                     message: 'No work schedules found',
-                    data: [] 
+                    data: []
                 });
                 return;
             }
@@ -82,9 +56,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error retrieving work schedules:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error retrieving work schedules' 
+                message: 'Error retrieving work schedules'
             });
         }
     }
@@ -97,20 +71,20 @@ export class WorkScheduleController {
         const { id } = req.params;
 
         if (!id || typeof id !== 'string') {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid ID',
-                message: 'Valid work schedule ID is required' 
+                message: 'Valid work schedule ID is required'
             });
             return;
         }
 
         try {
             const workSchedule = await this.workScheduleUseCases.findById(id);
-            
+
             if (!workSchedule) {
-                res.status(404).json({ 
+                res.status(404).json({
                     error: 'Not found',
-                    message: `Work schedule with ID ${id} not found` 
+                    message: `Work schedule with ID ${id} not found`
                 });
                 return;
             }
@@ -121,9 +95,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error retrieving work schedule:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error retrieving work schedule' 
+                message: 'Error retrieving work schedule'
             });
         }
     }
@@ -136,20 +110,20 @@ export class WorkScheduleController {
         const { document } = req.params;
 
         if (!document || typeof document !== 'string') {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid document',
-                message: 'Valid employee document is required' 
+                message: 'Valid employee document is required'
             });
             return;
         }
 
         try {
             const workSchedules = await this.workScheduleUseCases.findByEmployeeDocument(document);
-            
+
             if (!workSchedules || workSchedules.length === 0) {
-                res.status(404).json({ 
+                res.status(404).json({
                     message: `No work schedules found for employee ${document}`,
-                    data: [] 
+                    data: []
                 });
                 return;
             }
@@ -162,9 +136,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error retrieving employee work schedules:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error retrieving employee work schedules' 
+                message: 'Error retrieving employee work schedules'
             });
         }
     }
@@ -177,20 +151,20 @@ export class WorkScheduleController {
         const { storeId } = req.params;
 
         if (!storeId || typeof storeId !== 'string') {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid store ID',
-                message: 'Valid store ID is required' 
+                message: 'Valid store ID is required'
             });
             return;
         }
 
         try {
             const workSchedules = await this.workScheduleUseCases.findByStore(storeId);
-            
+
             if (!workSchedules || workSchedules.length === 0) {
-                res.status(404).json({ 
+                res.status(404).json({
                     message: `No work schedules found for store ${storeId}`,
-                    data: [] 
+                    data: []
                 });
                 return;
             }
@@ -203,9 +177,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error retrieving store work schedules:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error retrieving store work schedules' 
+                message: 'Error retrieving store work schedules'
             });
         }
     }
@@ -218,9 +192,9 @@ export class WorkScheduleController {
         const { date } = req.params;
 
         if (!date || typeof date !== 'string') {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid date',
-                message: 'Valid date (YYYY-MM-DD) is required' 
+                message: 'Valid date (YYYY-MM-DD) is required'
             });
             return;
         }
@@ -228,20 +202,20 @@ export class WorkScheduleController {
         // Validar formato de fecha
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(date)) {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid date format',
-                message: 'Date must be in YYYY-MM-DD format' 
+                message: 'Date must be in YYYY-MM-DD format'
             });
             return;
         }
 
         try {
             const workSchedules = await this.workScheduleUseCases.findByDate(date);
-            
+
             if (!workSchedules || workSchedules.length === 0) {
-                res.status(404).json({ 
+                res.status(404).json({
                     message: `No work schedules found for date ${date}`,
-                    data: [] 
+                    data: []
                 });
                 return;
             }
@@ -254,9 +228,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error retrieving date work schedules:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error retrieving date work schedules' 
+                message: 'Error retrieving date work schedules'
             });
         }
     }
@@ -269,9 +243,9 @@ export class WorkScheduleController {
         const { document, startDate } = req.params;
 
         if (!document || !startDate) {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Missing parameters',
-                message: 'Employee document and start date are required' 
+                message: 'Employee document and start date are required'
             });
             return;
         }
@@ -279,20 +253,20 @@ export class WorkScheduleController {
         // Validar formato de fecha
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(startDate)) {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid date format',
-                message: 'Start date must be in YYYY-MM-DD format' 
+                message: 'Start date must be in YYYY-MM-DD format'
             });
             return;
         }
 
         try {
             const weeklySchedule = await this.workScheduleUseCases.getWeeklySchedule(document, startDate);
-            
+
             if (!weeklySchedule || weeklySchedule.length === 0) {
-                res.status(404).json({ 
+                res.status(404).json({
                     message: `No weekly schedule found for employee ${document} starting ${startDate}`,
-                    data: [] 
+                    data: []
                 });
                 return;
             }
@@ -306,9 +280,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error retrieving weekly schedule:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error retrieving weekly schedule' 
+                message: 'Error retrieving weekly schedule'
             });
         }
     }
@@ -322,29 +296,29 @@ export class WorkScheduleController {
         const { status } = req.body;
 
         if (!id || !status) {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Missing parameters',
-                message: 'Work schedule ID and status are required' 
+                message: 'Work schedule ID and status are required'
             });
             return;
         }
 
         const validStatuses = ['assigned', 'completed', 'absent'];
         if (!validStatuses.includes(status)) {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid status',
-                message: `Status must be one of: ${validStatuses.join(', ')}` 
+                message: `Status must be one of: ${validStatuses.join(', ')}`
             });
             return;
         }
 
         try {
             const updatedWorkSchedule = await this.workScheduleUseCases.updateStatus(id, status);
-            
+
             if (!updatedWorkSchedule) {
-                res.status(404).json({ 
+                res.status(404).json({
                     error: 'Not found',
-                    message: `Work schedule with ID ${id} not found` 
+                    message: `Work schedule with ID ${id} not found`
                 });
                 return;
             }
@@ -355,9 +329,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error updating work schedule status:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error updating work schedule status' 
+                message: 'Error updating work schedule status'
             });
         }
     }
@@ -371,20 +345,20 @@ export class WorkScheduleController {
         const { shiftId } = req.body;
 
         if (!id || !shiftId) {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Missing parameters',
-                message: 'Work schedule ID and new shift ID are required' 
+                message: 'Work schedule ID and new shift ID are required'
             });
             return;
         }
 
         try {
             const updatedWorkSchedule = await this.workScheduleUseCases.changeShift(id, shiftId);
-            
+
             if (!updatedWorkSchedule) {
-                res.status(404).json({ 
+                res.status(404).json({
                     error: 'Not found',
-                    message: `Work schedule with ID ${id} not found` 
+                    message: `Work schedule with ID ${id} not found`
                 });
                 return;
             }
@@ -395,15 +369,15 @@ export class WorkScheduleController {
             });
         } catch (error: any) {
             if (error.message.includes('not found')) {
-                res.status(400).json({ 
+                res.status(400).json({
                     error: 'Validation error',
-                    message: error.message 
+                    message: error.message
                 });
             } else {
                 console.error('Error updating work schedule shift:', error);
-                res.status(500).json({ 
+                res.status(500).json({
                     error: 'Internal server error',
-                    message: 'Error updating work schedule shift' 
+                    message: 'Error updating work schedule shift'
                 });
             }
         }
@@ -417,20 +391,20 @@ export class WorkScheduleController {
         const { id } = req.params;
 
         if (!id || typeof id !== 'string') {
-            res.status(400).json({ 
+            res.status(400).json({
                 error: 'Invalid ID',
-                message: 'Valid work schedule ID is required' 
+                message: 'Valid work schedule ID is required'
             });
             return;
         }
 
         try {
             const deleted = await this.workScheduleUseCases.removeAssignment(id);
-            
+
             if (!deleted) {
-                res.status(404).json({ 
+                res.status(404).json({
                     error: 'Not found',
-                    message: `Work schedule with ID ${id} not found` 
+                    message: `Work schedule with ID ${id} not found`
                 });
                 return;
             }
@@ -441,9 +415,9 @@ export class WorkScheduleController {
             });
         } catch (error) {
             console.error('Error deleting work schedule:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Internal server error',
-                message: 'Error deleting work schedule' 
+                message: 'Error deleting work schedule'
             });
         }
     }

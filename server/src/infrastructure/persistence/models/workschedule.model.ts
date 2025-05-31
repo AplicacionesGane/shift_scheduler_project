@@ -1,7 +1,4 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { EmployeeModel } from '@infrastructure/persistence/models/employee.model';
-import { ShiftModel } from '@infrastructure/persistence/models/shitf.model';
-import { StoreModel } from '@infrastructure/persistence/models/store.model';
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 import { sequelize } from '@infrastructure/persistence/database';
 

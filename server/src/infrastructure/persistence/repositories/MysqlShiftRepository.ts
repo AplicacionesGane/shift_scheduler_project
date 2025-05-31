@@ -1,6 +1,6 @@
 import { ShiftModel } from '@infrastructure/persistence/models/shitf.model';
-import { ShiftValue } from '@domain/valueObjects/shift.value'
 import { ShiftRepository } from '@domain/repositories/shift.repository';
+import { ShiftValue } from '@domain/valueObjects/shift.value';
 import { Shift } from '@domain/entities/shift.entity';
 
 export class MysqlShiftRepository implements ShiftRepository {
@@ -8,19 +8,8 @@ export class MysqlShiftRepository implements ShiftRepository {
     create = async (shift: Shift): Promise<Shift> => {
         try {
             await ShiftModel.sync();
-            
-            const shiftData = {
-                id: shift.id,
-                startTime: shift.startTime,
-                endTime: shift.endTime,
-                date: shift.date,
-                nameTurno: shift.nameTurno,
-                description: shift.description,
-                createdAt: shift.createdAt,
-                updatedAt: shift.updatedAt
-            };
-            
-            const createdShift = await ShiftModel.create(shiftData);
+                
+            const createdShift = await ShiftModel.create(shift);
             
             // Convertir el resultado de Sequelize a ShiftValue
             return new ShiftValue({
