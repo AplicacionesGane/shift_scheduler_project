@@ -19,11 +19,11 @@ export class WorkScheduleUseCases {
         private readonly employeeRepo: EmployeeRepository,
         private readonly shiftRepo: ShiftRepository,
         private readonly storeRepo: StoreRepository
-    ) {}
+    ) { }
 
-    /**
-     * Crear una nueva asignación de turno
-     */
+
+    // TODO creacion y asinación de turnos a empleados
+
     async assignShift(workScheduleData: createWorkScheduleDTO): Promise<WorkSchedule> {
         // Validar que el empleado existe
         const employee = await this.employeeRepo.findById(workScheduleData.employeeDocument);
@@ -39,7 +39,7 @@ export class WorkScheduleUseCases {
 
         // Validar que no exista ya una asignación para ese empleado en esa fecha
         const existingAssignment = await this.findByEmployeeAndDate(
-            workScheduleData.employeeDocument, 
+            workScheduleData.employeeDocument,
             workScheduleData.assignedDate
         );
 
@@ -50,23 +50,43 @@ export class WorkScheduleUseCases {
         return this.workScheduleRepo.create(new WorkScheduleValue(workScheduleData));
     }
 
-    /**
-     * Obtener todas las asignaciones
-     */
+    // TODO consultas todos los turnos asignados a empleados
     async findAll(): Promise<WorkSchedule[] | null> {
         return this.workScheduleRepo.findAll();
     }
 
+    // TODO creacion y asinación de turnos a empleados
+    // * Esta implementacion debe mejorarse para que sea mas generica y reutilizable
+    
+    async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
+        // Si el repositorio tiene método específico, usarlo
+        if ('findByEmployeeAndDate' in this.workScheduleRepo) {
+            return (this.workScheduleRepo as any).findByEmployeeAndDate(employeeDocument, date);
+        }
+
+        // Fallback al método genérico
+        const allSchedules = await this.workScheduleRepo.findAll();
+        if (!allSchedules) return null;
+
+        return allSchedules.find(
+            schedule => schedule.employeeDocument === employeeDocument && schedule.assignedDate === date
+        ) || null;
+    }
+
+    async findSchedulesByStoreId(storeId: string): Promise<WorkSchedule[]    | null> {
+        const storeSchedules = await this.workScheduleRepo.findSchedulesByStoreId(storeId);
+
+        if (!storeSchedules || !storeSchedules.length) return null;
+
+        return storeSchedules;
+    }
+
     /**
-     * Obtener asignación por ID
-     */
+  
     async findById(id: string): Promise<WorkSchedule | null> {
         return this.workScheduleRepo.findById(id);
     }
 
-    /**
-     * Obtener horario de un empleado por documento
-     */
     async findByEmployeeDocument(employeeDocument: string): Promise<WorkSchedule[] | null> {
         // Si el repositorio tiene método específico, usarlo
         if ('findByEmployeeDocument' in this.workScheduleRepo) {
@@ -84,28 +104,10 @@ export class WorkScheduleUseCases {
         return employeeSchedules.length > 0 ? employeeSchedules : null;
     }
 
-    /**
-     * Obtener asignación específica de un empleado en una fecha
-     * TODO: Revisar si el repositorio tiene un método específico para esto
-     */
-    async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
-        // Si el repositorio tiene método específico, usarlo
-        if ('findByEmployeeAndDate' in this.workScheduleRepo) {
-            return (this.workScheduleRepo as any).findByEmployeeAndDate(employeeDocument, date);
-        }
 
-        // Fallback al método genérico
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
 
-        return allSchedules.find(
-            schedule => schedule.employeeDocument === employeeDocument && schedule.assignedDate === date
-        ) || null;
-    }
 
-    /**
-     * Obtener todas las asignaciones por tienda
-     */
+
     async findByStore(storeId: string): Promise<WorkSchedule[] | null> {
         // Si el repositorio tiene método específico, usarlo
         if ('findByStoreId' in this.workScheduleRepo) {
@@ -123,9 +125,6 @@ export class WorkScheduleUseCases {
         return storeSchedules.length > 0 ? storeSchedules : null;
     }
 
-    /**
-     * Obtener todas las asignaciones de una fecha específica
-     */
     async findByDate(date: string): Promise<WorkSchedule[] | null> {
         // Si el repositorio tiene método específico, usarlo
         if ('findByDate' in this.workScheduleRepo) {
@@ -143,9 +142,7 @@ export class WorkScheduleUseCases {
         return dateSchedules.length > 0 ? dateSchedules : null;
     }
 
-    /**
-     * Obtener horario semanal de un empleado
-     */
+ 
     async getWeeklySchedule(employeeDocument: string, weekStartDate: string): Promise<WorkSchedule[] | null> {
         // Calcular las 7 fechas de la semana
         const weekDates = this.getWeekDates(weekStartDate);
@@ -162,16 +159,12 @@ export class WorkScheduleUseCases {
         return weeklySchedules.length > 0 ? weeklySchedules : null;
     }
 
-    /**
-     * Cambiar el estado de una asignación
-     */
+
     async updateStatus(id: string, status: 'assigned' | 'completed' | 'absent'): Promise<WorkSchedule | null> {
         return this.workScheduleRepo.update(id, { status, updatedAt: new Date() });
     }
 
-    /**
-     * Cambiar turno de una asignación existente
-     */
+
     async changeShift(id: string, newShiftId: string): Promise<WorkSchedule | null> {
         // Validar que el nuevo turno existe
         const shift = await this.shiftRepo.findById(newShiftId);
@@ -185,16 +178,12 @@ export class WorkScheduleUseCases {
         });
     }
 
-    /**
-     * Eliminar una asignación
-     */
+ 
     async removeAssignment(id: string): Promise<boolean> {
         return this.workScheduleRepo.delete(id);
     }
 
-    /**
-     * Obtener resumen de asignaciones por tienda en una fecha
-     */
+
     async getStoreScheduleSummary(storeId: string, date: string): Promise<WorkSchedule[] | null> {
         const allSchedules = await this.workScheduleRepo.findAll();
         if (!allSchedules) return null;
@@ -206,9 +195,6 @@ export class WorkScheduleUseCases {
         return storeSchedules.length > 0 ? storeSchedules : null;
     }
 
-    /**
-     * Utility: Generar las fechas de una semana completa
-     */
     private getWeekDates(startDate: string): string[] {
         const dates: string[] = [];
         const start = new Date(startDate);
@@ -222,11 +208,10 @@ export class WorkScheduleUseCases {
         return dates;
     }
 
-    /**
-     * Validar formato de fecha
-     */
     private isValidDateFormat(date: string): boolean {
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         return dateRegex.test(date) && !isNaN(Date.parse(date));
     }
+
+    **/
 }

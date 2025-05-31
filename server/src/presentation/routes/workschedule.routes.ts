@@ -17,8 +17,9 @@ const shiftRepository = new MysqlShiftRepository();
 const storeRepository = new MysqlStoreRepository();
 
 /**
- * Iniciamos casos de uso
+ * Iniciar los usecases
  */
+
 const usecases = new WorkScheduleUseCases(
     workScheduleRepository,
     employeeRepository,
@@ -26,21 +27,18 @@ const usecases = new WorkScheduleUseCases(
     storeRepository
 );
 
-/**
- * Iniciamos los controladores
- */
+// Iniciar los controllers
 const controllers = new WorkScheduleController(usecases);
 
-/**
- * Definir rutas para Work Schedules
- */
 
-// Crear nueva asignación de turno
+
 routerWorkSchedule.post('/work-schedules', controllers.createWorkSchedule);
 
-// Obtener todas las asignaciones
 routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedules);
 
+routerWorkSchedule.get('/work-schedules/:storeId', controllers.getWorkSchedulesByStoreId);
+
+/*
 // Obtener asignación por ID
 routerWorkSchedule.get('/work-schedules/:id', controllers.getWorkScheduleById);
 
@@ -64,5 +62,5 @@ routerWorkSchedule.patch('/work-schedules/:id/shift', controllers.changeWorkSche
 
 // Eliminar asignación
 routerWorkSchedule.delete('/work-schedules/:id', controllers.deleteWorkSchedule);
-
+*/
 export { routerWorkSchedule };

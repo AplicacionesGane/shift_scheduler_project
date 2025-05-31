@@ -25,20 +25,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async findById(id: string): Promise<WorkSchedule | null> {
-        try {
-            const workSchedule = await WorkScheduleModel.findByPk(id);
-            
-            if (!workSchedule) return null;
-
-            return workSchedule.toJSON() as WorkSchedule;
-        } catch (error) {
-            console.error('Error finding work schedule by ID:', error);
-            throw new Error('Error finding work schedule by ID');
-        }
-    }
-
-    async findAll(): Promise<WorkSchedule[] | null> {
+    findAll = async (): Promise<WorkSchedule[] | null> => {
         try {
             await WorkScheduleModel.sync();
             const workSchedules = await WorkScheduleModel.findAll({
@@ -54,7 +41,22 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async update(id: string, workSchedule: Partial<WorkSchedule>): Promise<WorkSchedule | null> {
+    findSchedulesByStoreId(id: string): Promise<WorkSchedule[] | null> {
+        return WorkScheduleModel.findAll({
+            where: { storeId: id },
+            order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]
+        }).then(workSchedules => {
+            if (!workSchedules || workSchedules.length === 0) return null;
+            return workSchedules.map(ws => ws.toJSON() as WorkSchedule);
+        }).catch(error => {
+            console.error('Error finding work schedules by store ID:', error);
+            throw new Error('Error finding work schedules by store ID');
+        });
+    }
+
+    /**
+
+    update = async (id: string, workSchedule: Partial<WorkSchedule>): Promise<WorkSchedule | null> => {
         try {
             const [updatedRows] = await WorkScheduleModel.update(
                 {
@@ -77,7 +79,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async delete(id: string): Promise<boolean> {
+    delete = async (id: string): Promise<boolean> => {
         try {
             const deletedRows = await WorkScheduleModel.destroy({
                 where: { id }
@@ -91,7 +93,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
     }
 
     // Métodos adicionales específicos para consultas comunes
-    async findByEmployeeDocument(employeeDocument: string): Promise<WorkSchedule[] | null> {
+    findByEmployeeDocument = async (employeeDocument: string): Promise<WorkSchedule[] | null> => {
         try {
             const workSchedules = await WorkScheduleModel.findAll({
                 where: { employeeDocument },
@@ -107,7 +109,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async findByStoreId(storeId: string): Promise<WorkSchedule[] | null> {
+    findByStoreId = async (storeId: string): Promise<WorkSchedule[] | null> => {
         try {
             const workSchedules = await WorkScheduleModel.findAll({
                 where: { storeId },
@@ -123,7 +125,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async findByDate(date: string): Promise<WorkSchedule[] | null> {
+    findByDate = async (date: string): Promise<WorkSchedule[] | null> => {
         try {
             const workSchedules = await WorkScheduleModel.findAll({
                 where: { assignedDate: date },
@@ -139,7 +141,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
+    findByEmployeeAndDate = async (employeeDocument: string, date: string): Promise<WorkSchedule | null> => {
         try {
             const workSchedule = await WorkScheduleModel.findOne({
                 where: { 
@@ -155,7 +157,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         }
     }
 
-    async findByDateRange(startDate: string, endDate: string): Promise<WorkSchedule[] | null> {
+    findByDateRange = async (startDate: string, endDate: string): Promise<WorkSchedule[] | null> => {
         try {
             const { Op } = require('sequelize');
             
@@ -176,4 +178,5 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
             throw new Error('Error finding work schedules by date range');
         }
     }
+    */
 }
