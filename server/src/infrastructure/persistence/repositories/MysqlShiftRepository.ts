@@ -9,13 +9,13 @@ export class MysqlShiftRepository implements ShiftRepository {
         try {
             await ShiftModel.sync();
             
-            // El shift ya viene como ShiftValue del UseCase, solo extraemos los datos
             const shiftData = {
                 id: shift.id,
                 startTime: shift.startTime,
                 endTime: shift.endTime,
-                idStore: shift.idStore,
                 date: shift.date,
+                nameTurno: shift.nameTurno,
+                description: shift.description,
                 createdAt: shift.createdAt,
                 updatedAt: shift.updatedAt
             };
@@ -26,8 +26,9 @@ export class MysqlShiftRepository implements ShiftRepository {
             return new ShiftValue({
                 startTime: createdShift.startTime,
                 endTime: createdShift.endTime,
-                idStore: createdShift.idStore,
-                date: createdShift.date
+                date: createdShift.date,
+                nameTurno: createdShift.nameTurno,
+                description: createdShift.description
             });
             
         } catch (error) {
@@ -44,8 +45,9 @@ export class MysqlShiftRepository implements ShiftRepository {
             // Convertir el modelo de Sequelize a ShiftValue
             return new ShiftValue({
                 startTime: shift.startTime,
+                nameTurno: shift.nameTurno,
+                description: shift.description,
                 endTime: shift.endTime,
-                idStore: shift.idStore,
                 date: shift.date
             });
         } catch (error) {
@@ -63,7 +65,8 @@ export class MysqlShiftRepository implements ShiftRepository {
             return shifts.map(shift => new ShiftValue({
                 startTime: shift.startTime,
                 endTime: shift.endTime,
-                idStore: shift.idStore,
+                nameTurno: shift.nameTurno,
+                description: shift.description,
                 date: shift.date
             }));
         } catch (error) {

@@ -6,10 +6,11 @@ export class ShiftValue implements Shift {
     id: string;
     startTime: string;
     endTime: string;
-    idStore: string;
+    nameTurno: string;
     date: string;
     createdAt: Date;
     updatedAt: Date;
+    description?: string | undefined;
 
     constructor(shift: Omit<Shift, 'id' | 'createdAt' | 'updatedAt'>) {
         // Validaciones de formato y rango
@@ -18,8 +19,9 @@ export class ShiftValue implements Shift {
 
         this.id = uuidv4();
         this.startTime = shift.startTime;
-        this.idStore = shift.idStore ?? null;
         this.endTime = shift.endTime;
+        this.nameTurno = shift.nameTurno;
+        this.description = shift.description; 
         this.date = shift.date;
         this.createdAt = new Date();
         this.updatedAt = new Date();
