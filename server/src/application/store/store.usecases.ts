@@ -7,4 +7,8 @@ export class StoreUseCases {
     async findAll(): Promise<StoreEntity[] | null> {
         return this.storeRepo.findAll();
     }
+
+    async findById(id: string): Promise<StoreEntity | null> {
+        return this.storeRepo.findById(id);
+    }
 }

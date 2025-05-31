@@ -28,5 +28,6 @@ const controllers = new StoreController(usecases);
  */
 
 routerStores.get('/stores', controllers.getAllStores);
+routerStores.get('/stores/:id', controllers.getStoreById);
 
 export { routerStores }
