@@ -1,13 +1,13 @@
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, type FormEvent } from "react";
 import { type WorkSchedule } from "@/types/Interfaces";
 import { API_SERVER_URL } from "@/utils/constants";
-import { useState, type FormEvent, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axios from "axios";
-import { Input } from "@/components/ui/input";
 import { CalendarView } from "./calendar-view";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
 
 interface DateRange {
   startDate: string;
@@ -16,7 +16,7 @@ interface DateRange {
   year: number;
 }
 
-export default function programacion() {
+export default function Programacion() {
   const [data, setData] = useState<WorkSchedule[]>([]);
   const [storeId, setStoreId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
@@ -40,7 +40,24 @@ export default function programacion() {
     { value: 12, label: "Diciembre" }
   ];
 
-  // Calcular rango de fechas cuando cambie mes o año
+  const handleFetchData = (ev: FormEvent) => {
+    ev.preventDefault();
+    if (storeId && dateRange) {
+      const url = `${API_SERVER_URL}/work-schedules/${storeId}`;
+
+      axios.get<WorkSchedule[]>(url)
+        .then(response => {
+          setData(response.data || []);
+        })
+        .catch(error => {
+          console.error("Error fetching data:", error);
+        });
+    } else {
+      setData([]);
+    }
+  };
+
+    // Calcular rango de fechas cuando cambie mes o año
   useEffect(() => {
     const firstDay = new Date(yearActual, selectedMonth - 1, 1);
     const lastDay = new Date(yearActual, selectedMonth, 0); // Día 0 del siguiente mes = último día del mes actual
@@ -54,23 +71,6 @@ export default function programacion() {
 
     setDateRange(range);
   }, [selectedMonth]);
-
-  const handleFetchData = (ev: FormEvent) => {
-    ev.preventDefault();
-    if (storeId && dateRange) {
-      const url = `${API_SERVER_URL}/work-schedules/${storeId}?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
-
-      axios.get<WorkSchedule[]>(url)
-        .then(response => {
-          setData(response.data || []);
-        })
-        .catch(error => {
-          console.error("Error fetching data:", error);
-        });
-    } else {
-      setData([]);
-    }
-  };
 
   return (
     <>
