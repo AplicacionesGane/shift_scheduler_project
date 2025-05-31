@@ -5,7 +5,7 @@ import { Shift } from '@/domain/entities/shift.entity';
 class ShiftModel extends Model<InferAttributes<ShiftModel>, InferCreationAttributes<ShiftModel>> implements Shift {
     declare id?: string | undefined;
     declare startTime: string;
-    declare idStore: string | null;
+    declare idStore: string;
     declare endTime: string;
     declare date: string;
     declare createdAt?: Date | undefined;

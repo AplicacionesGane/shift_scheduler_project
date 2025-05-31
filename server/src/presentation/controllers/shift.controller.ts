@@ -1,19 +1,21 @@
+import { validateShiftEntry } from '@presentation/schemas/shiftSchemaValidate'
 import { ShiftUseCases } from '@application/shifts/shift.usecases'
-import e, { Request, Response } from 'express'
+import { Request, Response } from 'express'
 
 export class ShiftController {
     constructor(private shiftUseCase: ShiftUseCases) { }
 
     public createShift = async (req: Request, res: Response) => {
-        const shift = req.body
 
-        if (!shift || typeof shift !== 'object') {
-            res.status(400).json({ message: 'Shift data is required' })
+        const { success, data, error } = validateShiftEntry(req.body)
+
+        if (!success) {
+            res.status(400).json({ message: 'Invalid shift data', error: error.message })
             return
         }
 
         try {
-            const createdShift = await this.shiftUseCase.create(shift)
+            const createdShift = await this.shiftUseCase.execute(data)
             res.status(201).json(createdShift)
         } catch (error) {
             res.status(500).json({ message: 'Error on server to create shift' })

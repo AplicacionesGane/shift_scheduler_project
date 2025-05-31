@@ -5,14 +5,31 @@ import { Shift } from '@domain/entities/shift.entity';
 
 export class MysqlShiftRepository implements ShiftRepository {
 
-    create = async (shift: Omit<Shift, "id" | "createdAt" | "updatedAt">): Promise<Shift> => {
+    create = async (shift: Shift): Promise<Shift> => {
         try {
-            const newShift = new ShiftValue(shift);
-
             await ShiftModel.sync();
             
-            const createdShift = await ShiftModel.create(newShift);
-            return createdShift;
+            // El shift ya viene como ShiftValue del UseCase, solo extraemos los datos
+            const shiftData = {
+                id: shift.id,
+                startTime: shift.startTime,
+                endTime: shift.endTime,
+                idStore: shift.idStore,
+                date: shift.date,
+                createdAt: shift.createdAt,
+                updatedAt: shift.updatedAt
+            };
+            
+            const createdShift = await ShiftModel.create(shiftData);
+            
+            // Convertir el resultado de Sequelize a ShiftValue
+            return new ShiftValue({
+                startTime: createdShift.startTime,
+                endTime: createdShift.endTime,
+                idStore: createdShift.idStore,
+                date: createdShift.date
+            });
+            
         } catch (error) {
             console.error('Error creating shift:', error);
             throw new Error('Error creating shift');
@@ -22,17 +39,33 @@ export class MysqlShiftRepository implements ShiftRepository {
     findById = async (id: string): Promise<Shift | null> => {
         try {
             const shift = await ShiftModel.findByPk(id);
-            return shift;
+            if (!shift) return null;
+            
+            // Convertir el modelo de Sequelize a ShiftValue
+            return new ShiftValue({
+                startTime: shift.startTime,
+                endTime: shift.endTime,
+                idStore: shift.idStore,
+                date: shift.date
+            });
         } catch (error) {
             console.error('Error finding shift by ID:', error);
             throw new Error('Error finding shift by ID');
         }
     }
 
-    findAll = async (): Promise<Shift[] | null> => {
+    findAll = async (): Promise<Shift[]> => {
         try {
             await ShiftModel.sync();
-            return ShiftModel.findAll();
+            const shifts = await ShiftModel.findAll();
+            
+            // Convertir cada modelo a ShiftValue
+            return shifts.map(shift => new ShiftValue({
+                startTime: shift.startTime,
+                endTime: shift.endTime,
+                idStore: shift.idStore,
+                date: shift.date
+            }));
         } catch (error) {
             console.error('Error finding all shifts:', error);
             throw new Error('Error finding all shifts');

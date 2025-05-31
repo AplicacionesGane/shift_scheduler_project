@@ -26,7 +26,7 @@ export class ShiftUseCases {
         }
         // Crear el ShiftValue ya validado
         const shift = new ShiftValue(shiftData);
-        return await this.shiftRepo.save(shift);
+        return await this.shiftRepo.create(shift);
     }
 
     async findById(id: string): Promise<Shift | null> {
