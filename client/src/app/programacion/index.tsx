@@ -1,19 +1,153 @@
-import { useEffect } from "react"
-import axios from "axios"
-import { API_SERVER_URL } from "@/utils/constants"
+import { type WorkSchedule } from "@/types/Interfaces";
+import { API_SERVER_URL } from "@/utils/constants";
+import { useState, type FormEvent, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import axios from "axios";
+import { Input } from "@/components/ui/input";
+import { CalendarView } from "./calendar-view";
+import { Label } from "@/components/ui/label";
+
+interface DateRange {
+  startDate: string;
+  endDate: string;
+  month: number;
+  year: number;
+}
 
 export default function programacion() {
+  const [data, setData] = useState<WorkSchedule[]>([]);
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [yearActual] = useState<number>(new Date().getFullYear());
+  const [dateRange, setDateRange] = useState<DateRange | null>(null);
 
+
+  // Meses del año
+  const months = [
+    { value: 1, label: "Enero" },
+    { value: 2, label: "Febrero" },
+    { value: 3, label: "Marzo" },
+    { value: 4, label: "Abril" },
+    { value: 5, label: "Mayo" },
+    { value: 6, label: "Junio" },
+    { value: 7, label: "Julio" },
+    { value: 8, label: "Agosto" },
+    { value: 9, label: "Septiembre" },
+    { value: 10, label: "Octubre" },
+    { value: 11, label: "Noviembre" },
+    { value: 12, label: "Diciembre" }
+  ];
+
+  // Calcular rango de fechas cuando cambie mes o año
   useEffect(() => {
-    axios.get(`${API_SERVER_URL}/work-schedules/39825`)
-  }, [])
+    const firstDay = new Date(yearActual, selectedMonth - 1, 1);
+    const lastDay = new Date(yearActual, selectedMonth, 0); // Día 0 del siguiente mes = último día del mes actual
+
+    const range: DateRange = {
+      startDate: firstDay.toISOString().split('T')[0], // YYYY-MM-DD
+      endDate: lastDay.toISOString().split('T')[0],
+      month: selectedMonth,
+      year: yearActual
+    };
+
+    setDateRange(range);
+  }, [selectedMonth]);
+
+  const handleFetchData = (ev: FormEvent) => {
+    ev.preventDefault();
+    if (storeId && dateRange) {
+      const url = `${API_SERVER_URL}/work-schedules/${storeId}?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
+
+      axios.get<WorkSchedule[]>(url)
+        .then(response => {
+          setData(response.data || []);
+        })
+        .catch(error => {
+          console.error("Error fetching data:", error);
+        });
+    } else {
+      setData([]);
+    }
+  };
 
   return (
-    <div className="px-4">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <h1 className="text-2xl font-bold">Programación</h1>
-        <p>Esta es la página de programación.</p>
-      </div>
-    </div>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Programación de Turnos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleFetchData} className="flex items-center justify-around gap-4 ">
+            {/* Selector de Mes y Año */}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Año</label>
+              <Input type="text" className="w-20" disabled value={yearActual} />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Mes</label>
+              <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar mes" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((month) => (
+                    <SelectItem key={month.value} value={month.value.toString()}>
+                      {month.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Tienda</label>
+              <Input value={storeId || ""} onChange={(e) => setStoreId(e.target.value)} placeholder="Ingrese ID de tienda" />
+            </div>
+
+
+
+            {/* Información del rango de fechas */}
+            {dateRange && (
+              <div className="bg-gray-50 p-3 rounded-lg items-center justify-center">
+                <Label className="flex flex-col text-sm font-medium">
+                  <p className="text-sm text-gray-600">
+                    <span>Período seleccionado: </span>
+                    ({new Date(yearActual, selectedMonth, 0).getDate()} días)
+                  </p>
+                  <strong>{dateRange.startDate} al {dateRange.endDate}</strong>
+                </Label>
+              </div>
+            )}
+
+            <Button type="submit" disabled={!storeId} className="w-full md:w-auto">
+              Consultar Programación
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Calendario de turnos */}
+      {data.length > 0 && dateRange && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Calendario de Turnos - {months.find(m => m.value === selectedMonth)?.label} {yearActual}</CardTitle>
+            <p className="text-sm text-gray-600">
+              Se encontraron {data.length} turnos programados
+            </p>
+          </CardHeader>
+          <CardContent>
+            <CalendarView
+              schedules={data}
+              month={selectedMonth}
+              year={yearActual}
+            />
+          </CardContent>
+        </Card>
+      )}
+    </>
   )
 }

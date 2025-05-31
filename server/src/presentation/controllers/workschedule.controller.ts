@@ -70,7 +70,7 @@ export class WorkScheduleController {
                 });
                 return;
             }
-            res.status(200).json({ data: workSchedules });
+            res.status(200).json(workSchedules);
         } catch (error) {
             console.error('Error retrieving work schedules by store ID:', error);
             res.status(500).json({
