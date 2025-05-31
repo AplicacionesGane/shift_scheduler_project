@@ -1,3 +1,4 @@
+import { ValidationService } from '@domain/services/ValidationServices';
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,6 +13,9 @@ export class WorkScheduleValue implements WorkSchedule {
     updatedAt: Date;
 
     constructor(workSchedule: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>) {
+        // Validaciones de formato y rango
+        ValidationService.validateDateFormat(workSchedule.assignedDate);
+
         this.id = uuidv4();
         this.employeeDocument = workSchedule.employeeDocument;
         this.shiftId = workSchedule.shiftId;

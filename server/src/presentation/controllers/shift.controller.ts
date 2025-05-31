@@ -10,7 +10,7 @@ export class ShiftController {
         const { success, data, error } = validateShiftEntry(req.body)
 
         if (!success) {
-            res.status(400).json({ message: 'Invalid shift data', error: error.message })
+            res.status(400).json({ message: 'Invalid shift data', error: error.format() })
             return
         }
 
@@ -18,6 +18,10 @@ export class ShiftController {
             const createdShift = await this.shiftUseCase.execute(data)
             res.status(201).json(createdShift)
         } catch (error) {
+            if(error instanceof Error ){
+                res.status(400).json({ message: error.message })
+                return 
+            }
             res.status(500).json({ message: 'Error on server to create shift' })
         }
     }
