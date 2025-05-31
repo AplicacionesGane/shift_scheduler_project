@@ -58,6 +58,12 @@ export class WorkScheduleUseCases {
      * Obtener horario de un empleado por documento
      */
     async findByEmployeeDocument(employeeDocument: string): Promise<WorkSchedule[] | null> {
+        // Si el repositorio tiene método específico, usarlo
+        if ('findByEmployeeDocument' in this.workScheduleRepo) {
+            return (this.workScheduleRepo as any).findByEmployeeDocument(employeeDocument);
+        }
+
+        // Fallback al método genérico
         const allSchedules = await this.workScheduleRepo.findAll();
         if (!allSchedules) return null;
 
@@ -72,6 +78,12 @@ export class WorkScheduleUseCases {
      * Obtener asignación específica de un empleado en una fecha
      */
     async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
+        // Si el repositorio tiene método específico, usarlo
+        if ('findByEmployeeAndDate' in this.workScheduleRepo) {
+            return (this.workScheduleRepo as any).findByEmployeeAndDate(employeeDocument, date);
+        }
+
+        // Fallback al método genérico
         const allSchedules = await this.workScheduleRepo.findAll();
         if (!allSchedules) return null;
 
@@ -84,6 +96,12 @@ export class WorkScheduleUseCases {
      * Obtener todas las asignaciones por tienda
      */
     async findByStore(storeId: string): Promise<WorkSchedule[] | null> {
+        // Si el repositorio tiene método específico, usarlo
+        if ('findByStoreId' in this.workScheduleRepo) {
+            return (this.workScheduleRepo as any).findByStoreId(storeId);
+        }
+
+        // Fallback al método genérico
         const allSchedules = await this.workScheduleRepo.findAll();
         if (!allSchedules) return null;
 
@@ -98,6 +116,12 @@ export class WorkScheduleUseCases {
      * Obtener todas las asignaciones de una fecha específica
      */
     async findByDate(date: string): Promise<WorkSchedule[] | null> {
+        // Si el repositorio tiene método específico, usarlo
+        if ('findByDate' in this.workScheduleRepo) {
+            return (this.workScheduleRepo as any).findByDate(date);
+        }
+
+        // Fallback al método genérico
         const allSchedules = await this.workScheduleRepo.findAll();
         if (!allSchedules) return null;
 

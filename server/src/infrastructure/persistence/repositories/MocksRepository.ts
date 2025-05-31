@@ -1,8 +1,11 @@
 import { EmployeeRepository } from '@domain/repositories/employee.repository';
 import { StoreRepository } from '@domain/repositories/store.repository';
+import { WorkScheduleRepository } from '@domain/repositories/workschedule.repository';
 
 import { EmployeeEntity } from '@domain/entities/employe.entity';
 import { StoreEntity } from '@domain/entities/store.entity';
+import { WorkSchedule } from '@domain/entities/workschedule.entity';
+import { WorkScheduleValue } from '@domain/valueObjects/workschedule.value';
 
 import EmployesMocks from '@data/employees.json';
 import StoresMocks from '@data/stores.json';
@@ -93,5 +96,111 @@ export class MockStoreRepository implements StoreRepository {
             });
             resolve(stores.length > 0 ? stores : null);
         });
+    }
+}
+
+export class MockWorkScheduleRepository implements WorkScheduleRepository {
+    private workSchedules: WorkSchedule[] = [];
+
+    async create(workSchedule: Omit<WorkSchedule, "id" | "createdAt" | "updatedAt">): Promise<WorkSchedule> {
+        try {
+            const newWorkSchedule = new WorkScheduleValue(workSchedule);
+            this.workSchedules.push(newWorkSchedule);
+            return Promise.resolve(newWorkSchedule);
+        } catch (error) {
+            console.error('Error creating work schedule:', error);
+            throw new Error('Error creating work schedule');
+        }
+    }
+
+    async findById(id: string): Promise<WorkSchedule | null> {
+        return new Promise((resolve) => {
+            const workSchedule = this.workSchedules.find(ws => ws.id === id);
+            resolve(workSchedule || null);
+        });
+    }
+
+    async findAll(): Promise<WorkSchedule[] | null> {
+        return new Promise((resolve) => {
+            const sortedSchedules = this.workSchedules.sort((a, b) => 
+                a.assignedDate.localeCompare(b.assignedDate)
+            );
+            resolve(sortedSchedules.length > 0 ? sortedSchedules : null);
+        });
+    }
+
+    async update(id: string, workSchedule: Partial<WorkSchedule>): Promise<WorkSchedule | null> {
+        return new Promise((resolve) => {
+            const index = this.workSchedules.findIndex(ws => ws.id === id);
+            if (index !== -1) {
+                this.workSchedules[index] = { 
+                    ...this.workSchedules[index], 
+                    ...workSchedule,
+                    updatedAt: new Date()
+                };
+                resolve(this.workSchedules[index]);
+            } else {
+                resolve(null);
+            }
+        });
+    }
+
+    async delete(id: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            const index = this.workSchedules.findIndex(ws => ws.id === id);
+            if (index !== -1) {
+                this.workSchedules.splice(index, 1);
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+    }
+
+    // Métodos específicos para testing
+    async findByEmployeeDocument(employeeDocument: string): Promise<WorkSchedule[] | null> {
+        return new Promise((resolve) => {
+            const employeeSchedules = this.workSchedules.filter(
+                ws => ws.employeeDocument === employeeDocument
+            ).sort((a, b) => a.assignedDate.localeCompare(b.assignedDate));
+            resolve(employeeSchedules.length > 0 ? employeeSchedules : null);
+        });
+    }
+
+    async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
+        return new Promise((resolve) => {
+            const workSchedule = this.workSchedules.find(
+                ws => ws.employeeDocument === employeeDocument && ws.assignedDate === date
+            );
+            resolve(workSchedule || null);
+        });
+    }
+
+    async findByStoreId(storeId: string): Promise<WorkSchedule[] | null> {
+        return new Promise((resolve) => {
+            const storeSchedules = this.workSchedules.filter(
+                ws => ws.storeId === storeId
+            ).sort((a, b) => a.assignedDate.localeCompare(b.assignedDate));
+            resolve(storeSchedules.length > 0 ? storeSchedules : null);
+        });
+    }
+
+    async findByDate(date: string): Promise<WorkSchedule[] | null> {
+        return new Promise((resolve) => {
+            const dateSchedules = this.workSchedules.filter(
+                ws => ws.assignedDate === date
+            );
+            resolve(dateSchedules.length > 0 ? dateSchedules : null);
+        });
+    }
+
+    // Utility para limpiar datos en tests
+    clearAll(): void {
+        this.workSchedules = [];
+    }
+
+    // Utility para obtener el count actual
+    getCount(): number {
+        return this.workSchedules.length;
     }
 }
