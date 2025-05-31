@@ -1,10 +1,11 @@
 import { routerWorkSchedule } from './presentation/routes/workschedule.routes';
 import { routerEmploye } from './presentation/routes/employee.routes';
 import { routerStores } from './presentation/routes/stores.routes';
+import { routerShift } from './presentation/routes/shift.routes';
 
 import { sequelize } from '@infrastructure/persistence/database';
+import { SimpleLogger } from '@/presentation/middleware/simple-logger.middleware';
 import express from 'express';
-import { routerShift } from './presentation/routes/shift.routes';
 
 const app = express();
 
@@ -12,6 +13,9 @@ const app = express();
 app.disable('x-powered-by')
     .use(express.json())
     .use(express.urlencoded({ extended: true }));
+
+// Logger middleware
+app.use(SimpleLogger.requestLogger());
 
 
 // test route
