@@ -1,4 +1,4 @@
-import { MysqlEmployeeRepository } from '@infrastructure/persistence/repositories/MysqlEmployeeRepository';
+import { MysqlEmployeeRepository } from '@/infrastructure/repositories/mysql/MysqlEmployeeRepository';
 import { EmployeeController } from '@presentation/controllers/employee.controller';
 import { EmployeeUseCases } from '@application/employee/employe.usecases';
 import { Router } from 'express';

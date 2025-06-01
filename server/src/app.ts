@@ -4,7 +4,7 @@ import { routerStores } from './presentation/routes/stores.routes';
 import { routerShift } from './presentation/routes/shift.routes';
 
 import { SimpleLogger } from '@/presentation/middleware/simple-logger.middleware';
-import { sequelize } from '@infrastructure/persistence/database';
+import { sequelize } from '@/infrastructure/persistence/connection';
 
 import express from 'express';
 import cors from 'cors';

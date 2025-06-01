@@ -1,7 +1,7 @@
 import { Shift } from '@domain/entities/shift.entity'
 
 export interface ShiftRepository {
-  save(shift: Shift): Promise<Shift>;
-  findById(id: string): Promise<Shift | null>;
-  findAll(): Promise<Shift[] | []>;
+  saveShift(shift: Shift): Promise<Shift>;
+  findShiftById(id: string): Promise<Shift | null>;
+  findShiftAll(): Promise<Shift[] | []>;
 }

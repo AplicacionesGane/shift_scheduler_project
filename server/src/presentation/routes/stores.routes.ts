@@ -1,4 +1,4 @@
-import { MysqlStoreRepository } from '@infrastructure/persistence/repositories/MysqlStoreRepository';
+import { MysqlStoreRepository } from '@/infrastructure/repositories/mysql/MysqlStoreRepository';
 import { StoreController } from '@presentation/controllers/store.controller';
 import { StoreUseCases } from '@application/store/store.usecases';
 import { Router } from 'express';

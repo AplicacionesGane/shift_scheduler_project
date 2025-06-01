@@ -1,5 +1,5 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { sequelize } from '@infrastructure/persistence/database';
+import { sequelize } from '@/infrastructure/persistence/connection';
 
 class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferCreationAttributes<WorkScheduleModel>> {
     declare id?: string;

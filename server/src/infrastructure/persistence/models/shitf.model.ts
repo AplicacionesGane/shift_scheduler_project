@@ -1,5 +1,5 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { sequelize } from '@infrastructure/persistence/database';
+import { sequelize } from '@/infrastructure/persistence/connection';
 
 class ShiftModel extends Model<InferAttributes<ShiftModel>, InferCreationAttributes<ShiftModel>> {
   declare id?: string | undefined;

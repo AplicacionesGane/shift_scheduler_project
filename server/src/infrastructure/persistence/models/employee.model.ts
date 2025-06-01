@@ -1,5 +1,5 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { sequelize } from '@infrastructure/persistence/database';
+import { sequelize } from '@/infrastructure/persistence/connection';
 
 export class EmployeeModel extends Model<InferAttributes<EmployeeModel>, InferCreationAttributes<EmployeeModel>> {
   declare DOCUMENTO: string;

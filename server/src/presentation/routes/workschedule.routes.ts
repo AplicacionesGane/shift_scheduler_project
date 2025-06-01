@@ -1,7 +1,7 @@
-import { MysqlWorkScheduleRepository } from '@infrastructure/persistence/repositories/MysqlWorkScheduleRepository';
-import { MysqlEmployeeRepository } from '@infrastructure/persistence/repositories/MysqlEmployeeRepository';
-import { MysqlShiftRepository } from '@infrastructure/persistence/repositories/MysqlShiftRepository';
-import { MysqlStoreRepository } from '@infrastructure/persistence/repositories/MysqlStoreRepository';
+import { MysqlWorkScheduleRepository } from '@/infrastructure/repositories/mysql/MysqlWorkScheduleRepository';
+import { MysqlEmployeeRepository } from '@/infrastructure/repositories/mysql/MysqlEmployeeRepository';
+import { MysqlShiftRepository } from '@/infrastructure/repositories/mysql/MysqlShiftRepository';
+import { MysqlStoreRepository } from '@/infrastructure/repositories/mysql/MysqlStoreRepository';
 import { WorkScheduleController } from '@presentation/controllers/workschedule.controller';
 import { WorkScheduleUseCases } from '@application/workschedule/workschedule.usecases';
 import { Router } from 'express';
