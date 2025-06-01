@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 export class WorkScheduleController {
   constructor(private readonly workScheduleUseCases: WorkScheduleUseCases) { }
 
-  public createWorkSchedule = async (req: Request, res: Response) => {
+  public createWorkScheduleCtrl = async (req: Request, res: Response) => {
     const { success, data, error } = validateWorkSchedule(req.body);
 
     if (!success) {
@@ -25,7 +25,7 @@ export class WorkScheduleController {
     }
   }
 
-  public getAllWorkSchedules = async (req: Request, res: Response) => {
+  public getAllWorkSchedulesCtrl = async (req: Request, res: Response) => {
     try {
       const workSchedules = await this.workScheduleUseCases.findAllWorkSchedules();
 
@@ -44,7 +44,7 @@ export class WorkScheduleController {
     }
   }
 
-  public findByStoreIdWhitMonthAndYear = async (req: Request, res: Response) => {
+  public findByStoreIdWhitMonthAndYearCtrl = async (req: Request, res: Response) => {
     const { storeId, year, month } = req.params;
 
     if (!storeId || typeof storeId !== 'string' || !year || !month || isNaN(parseInt(year)) || isNaN(parseInt(month))) {
@@ -67,7 +67,7 @@ export class WorkScheduleController {
     }
   }
 
-  public getWorkScheduleByDocumentAndDate = async (req: Request, res: Response) => {
+  public getWorkScheduleByDocumentAndDateCtrl = async (req: Request, res: Response) => {
     const { document, date } = req.params;
     const [year, month, day] = date.split('-').map(Number);
 

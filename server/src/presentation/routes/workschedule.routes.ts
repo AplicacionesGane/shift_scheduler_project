@@ -32,9 +32,9 @@ const controllers = new WorkScheduleController(usecases);
 
 
 
-routerWorkSchedule.post('/work-schedules', controllers.createWorkSchedule);
-routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedules);
-routerWorkSchedule.get('/work-schedules/:storeId/:year/:month', controllers.findByStoreIdWhitMonthAndYear);
-routerWorkSchedule.get('/work-schedules/:document/:date', controllers.getWorkScheduleByDocumentAndDate);
+routerWorkSchedule.post('/work-schedules', controllers.createWorkScheduleCtrl);
+routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedulesCtrl);
+routerWorkSchedule.get('/work-schedules/:storeId/:year/:month', controllers.findByStoreIdWhitMonthAndYearCtrl);
+routerWorkSchedule.get('/work-schedules/:document/:date', controllers.getWorkScheduleByDocumentAndDateCtrl);
 
 export { routerWorkSchedule };

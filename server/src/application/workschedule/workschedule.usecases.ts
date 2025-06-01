@@ -27,10 +27,10 @@ export class WorkScheduleUseCases {
     const employee = await this.employeeRepo.findEmployeeById(newSchedule.employee);
     if (!employee) throw new Error(`Employee with document ${newSchedule.employee} not found or not exist`);
 
-    const shift = await this.shiftRepo.findById(newSchedule.shiftId);
+    const shift = await this.shiftRepo.findShiftById(newSchedule.shiftId);
     if (!shift) throw new Error(`Shift with id ${newSchedule.shiftId} not found`);
 
-    const store = await this.storeRepo.findById(newSchedule.storeId);
+    const store = await this.storeRepo.findStoreById(newSchedule.storeId);
     if (!store) throw new Error(`Store with id ${newSchedule.storeId} not found`);
 
 
