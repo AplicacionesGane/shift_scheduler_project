@@ -20,8 +20,7 @@ export class ShiftUseCases {
   }
 
   updateShift = async (shiftData: Shift): Promise<Shift> => {
-    const shiftValue = new ShiftValue(shiftData);
-    const updatedShift = await this.shiftRepo.updateShift(shiftValue);
+    const updatedShift = await this.shiftRepo.updateShift(shiftData);
     return updatedShift;
   }
 

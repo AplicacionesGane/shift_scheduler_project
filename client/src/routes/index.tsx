@@ -4,6 +4,7 @@ import Configuracion from "@/app/configuracion";
 import Programacion from "@/app/programacion";
 import Employees from "@/app/employees";
 import Dashboard from "@/app/dashboard";
+import Shifts from "@/app/turnos";
 
 import Root from "@/routes/root";
 
@@ -27,6 +28,10 @@ export const RouterMain = createBrowserRouter([
       {
         path: "config",
         element: <Configuracion />
+      },
+      {
+        path: "shifts",
+        element: <Shifts />
       }
     ]
   }

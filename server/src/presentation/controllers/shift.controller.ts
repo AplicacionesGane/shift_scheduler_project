@@ -29,14 +29,14 @@ export class ShiftController {
   }
 
   public updateCtrl = async (req: Request, res: Response) => {
-    try {
+    try {   
       const { success, data, error } = validateShiftEntry(req.body);
 
       if (!success) {
         res.status(400).json({ message: 'Error to update Shift', error: error.format() });
         return;
       }
-
+      
       const updatedShift = await this.shiftUseCase.updateShift(data);
       res.status(200).json({ message: 'Shift updated successfully', data: updatedShift });
     } catch (error) {

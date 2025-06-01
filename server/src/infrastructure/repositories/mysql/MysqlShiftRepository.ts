@@ -46,20 +46,23 @@ export class MysqlShiftRepository implements ShiftRepository {
 
   updateShift = async (shift: Shift): Promise<Shift> =>{
     try {
-      const shiftModel = await ShiftModel.findByPk(shift.id);
 
-      if (!shiftModel) {
+      const updateShift = await ShiftModel.update(shift, {
+        where: { id: shift.id }
+      });
+
+      if (!updateShift) {
         throw new Error('Shift not found');
       }
 
-      const updateShift = await shiftModel.update({
-        startTime: shift.startTime,
-        endTime: shift.endTime,
-        nameTurno: shift.nameTurno,
-        description: shift.description
-      });
+      // Si se actualizó correctamente, buscamos el shift actualizado
+      const updatedShift = await ShiftModel.findByPk(shift.id);
 
-      return updateShift;
+      if (!updatedShift) {
+        throw new Error('Shift not found after update');
+      }
+
+      return updatedShift;
     } catch (error) {
       console.error('Error updating shift:', error);
       throw new Error('Error updating shift');
