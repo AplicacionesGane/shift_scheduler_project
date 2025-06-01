@@ -3,7 +3,6 @@ import { z } from "zod";
 export const shiftSchemaValidate = z.object({
     startTime: z.string().min(1, "Start time is required"),
     endTime: z.string().min(1, "End time is required"),
-    date: z.string().min(1, "Date is required"),
     nameTurno: z.string().min(1, "Name of the shift is required"),
     description: z.string().optional(),
 });

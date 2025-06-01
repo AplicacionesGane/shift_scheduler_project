@@ -15,7 +15,6 @@ export class MysqlShiftRepository implements ShiftRepository {
             return new ShiftValue({
                 startTime: createdShift.startTime,
                 endTime: createdShift.endTime,
-                date: createdShift.date,
                 nameTurno: createdShift.nameTurno,
                 description: createdShift.description
             });
@@ -36,8 +35,7 @@ export class MysqlShiftRepository implements ShiftRepository {
                 startTime: shift.startTime,
                 nameTurno: shift.nameTurno,
                 description: shift.description,
-                endTime: shift.endTime,
-                date: shift.date
+                endTime: shift.endTime
             });
         } catch (error) {
             console.error('Error finding shift by ID:', error);
@@ -55,8 +53,7 @@ export class MysqlShiftRepository implements ShiftRepository {
                 startTime: shift.startTime,
                 endTime: shift.endTime,
                 nameTurno: shift.nameTurno,
-                description: shift.description,
-                date: shift.date
+                description: shift.description
             }));
         } catch (error) {
             console.error('Error finding all shifts:', error);

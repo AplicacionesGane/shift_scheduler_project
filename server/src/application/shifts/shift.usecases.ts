@@ -1,4 +1,3 @@
-
 import { ShiftRepository } from '@domain/repositories/shift.repository';
 import { ShiftValue } from '@/domain/valueObjects/shift.value';
 import { Shift } from '@domain/entities/shift.entity';
@@ -6,7 +5,6 @@ import { Shift } from '@domain/entities/shift.entity';
 export interface CreateShiftDTO {
     startTime: string;
     endTime: string;
-    date: string;
     nameTurno: string;
     description?: string;
 }

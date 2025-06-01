@@ -16,7 +16,9 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
         employee: createdWorkSchedule.dataValues.employee,
         shiftId: createdWorkSchedule.dataValues.shiftId,
         storeId: createdWorkSchedule.dataValues.storeId,
-        assignedDate: createdWorkSchedule.dataValues.assignedDate,
+        year: createdWorkSchedule.dataValues.year,
+        month: createdWorkSchedule.dataValues.month,
+        day: createdWorkSchedule.dataValues.day,
         status: createdWorkSchedule.dataValues.status,
         createdAt: createdWorkSchedule.dataValues.createdAt,
         updatedAt: createdWorkSchedule.dataValues.updatedAt
@@ -30,27 +32,40 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
     }
   }
 
-  findByStoreId = async (id: string): Promise<WorkSchedule[] | null> => {
-    return WorkScheduleModel.findAll({
-      where: { storeId: id },
-      order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]
-    }).then(workSchedules => {
-      if (!workSchedules || workSchedules.length === 0) return null;
-      return workSchedules.map(ws => ws.toJSON() as WorkSchedule);
-    }).catch(error => {
+  findByStoreYearMonth = async (id: string, year: number, month: number): Promise<WorkSchedule[] | []> => {
+    try {
+      await WorkScheduleModel.sync();
+      const workSchedules = await WorkScheduleModel.findAll({
+        where: { storeId: id, year, month },
+        order: [['day', 'ASC']]
+      })
+
+      if (!workSchedules || workSchedules.length === 0) return [];
+
+      return workSchedules.map(schedule => ({
+        id: schedule.dataValues.id,
+        employee: schedule.dataValues.employee,
+        shiftId: schedule.dataValues.shiftId,
+        storeId: schedule.dataValues.storeId,
+        year: schedule.dataValues.year,
+        month: schedule.dataValues.month,
+        day: schedule.dataValues.day,
+        status: schedule.dataValues.status,
+        createdAt: schedule.dataValues.createdAt,
+        updatedAt: schedule.dataValues.updatedAt
+      }));
+
+    } catch (error) {
       console.error('Error finding work schedules by store ID:', error);
       throw new Error('Error finding work schedules by store ID');
-    });
+    }
   }
 
-  findByDocumentAndDate = async (document: string, dateAsing: string): Promise<boolean | null> => {
+  findByDocumentAndDate = async (document: string, year: number, month: number, day: number): Promise<boolean | null> => {
     try {
       const schedule = await WorkScheduleModel.findOne({
         attributes: ['id'],
-        where: {
-          employee: document,
-          assignedDate: dateAsing
-        }
+        where: { employee: document, year, month, day }
       })
 
       if (!schedule) return null;
@@ -63,7 +78,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
   }
 
   findAll = async (): Promise<WorkSchedule[] | null> => {
-   try {
+    try {
       await WorkScheduleModel.sync();
       const workSchedules = await WorkScheduleModel.findAll({
         order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]

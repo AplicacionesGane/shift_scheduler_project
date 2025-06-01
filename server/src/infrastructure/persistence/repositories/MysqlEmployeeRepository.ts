@@ -26,6 +26,7 @@ export class MysqlEmployeeRepository implements EmployeeRepository {
 
   findAllEmployees = async (): Promise<EmployeeEntity[] | null> => {
     try {
+      await EmployeeModel.sync();
       const employees = await EmployeeModel.findAll({
         order: [['nombres', 'ASC']]
       });
