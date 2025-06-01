@@ -1,7 +1,9 @@
-export default function Page() {
+export default function DashboardPage() {
   return (
-    <div className="flex flex-1 flex-col">
-      <p>this is a dashboard</p>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <p className="text-gray-700">Esta página está en construcción.</p>
+      <p className="text-gray-500">Pronto podrás ver y gestionar el dashboard aquí.</p>
     </div>
   )
 }

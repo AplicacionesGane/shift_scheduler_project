@@ -1,11 +1,12 @@
-import { memo } from 'react';
 import { useShiftsStore } from '@/stores/shiftsStore';
+import { memo } from 'react';
 
 interface ShiftCardProps {
   shiftId: string;
+  employee: string;
 }
 
-export const ShiftCard = memo(({ shiftId }: ShiftCardProps) => {
+export const ShiftCard = memo(({ shiftId, employee }: ShiftCardProps) => {
   const shiftsCache = useShiftsStore((state) => state.shiftsCache);
   const isLoading = useShiftsStore((state) => state.isLoading);
   const shift = shiftsCache[shiftId];
@@ -30,6 +31,7 @@ export const ShiftCard = memo(({ shiftId }: ShiftCardProps) => {
 
   return (
     <div className="text-xs p-1 rounded bg-blue-500 text-white truncate">
+      <div className="text-gray-200 flex justify-between px-1"><span>Empleado: </span> <span>{employee}</span></div>
       <div className="font-medium">👤 {shift.nameTurno}</div>
       <div className="text-blue-100">🕐 {shift.startTime} - {shift.endTime}</div>
     </div>

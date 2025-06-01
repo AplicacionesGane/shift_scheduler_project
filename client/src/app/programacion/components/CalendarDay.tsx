@@ -32,7 +32,7 @@ export const CalendarDay = memo(({ dayNumber, isCurrentMonth, schedules }: Calen
       <div className="space-y-1">
         {schedules.length > 0 ? (
           schedules.map((schedule) => (
-            <ShiftCard key={schedule.id} shiftId={schedule.shiftId} />
+            <ShiftCard key={schedule.id} shiftId={schedule.shiftId} employee={schedule.employee} />
           ))
         ) : (
           <div className="text-xs text-gray-500">No hay programaciones</div>

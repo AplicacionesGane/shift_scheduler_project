@@ -8,13 +8,13 @@ export function NavBar() {
     { icon: Home, label: "Dashboard", href: "/" },
     { icon: Calendar, label: "Programación", href: "/programacion" },
     { icon: Users, label: "Empleados", href: "/employees" },
-    { icon: Settings, label: "Configuración", href: "/settings" },
+    { icon: Settings, label: "Configuración", href: "/config" },
   ]
 
   return (
     <>
       {/* Header */}
-      <div className="p-4 flex items-center border-b">
+      <div className="p-4 flex items-center justify-center border-b w-full">
         <h2 className="text-xl font-bold">Shift Scheduler</h2>
       </div>
 
