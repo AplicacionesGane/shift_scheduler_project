@@ -27,7 +27,8 @@ const controllers = new EmployeeController(usecases);
  * Definir rutas
  */
 
-routerEmploye.get('/employees', controllers.getAllEmployees)
-routerEmploye.get('/employees/:documento', controllers.getEmployeeById)
+routerEmploye.get('/employees', controllers.getAllEmployeesCtrl)
+routerEmploye.get('/employees/:documento', controllers.getEmployeeByIdCtrl)
+routerEmploye.get('/employees/cargo/:cargo', controllers.getEmployeesByCargoCtrl);
 
 export { routerEmploye }

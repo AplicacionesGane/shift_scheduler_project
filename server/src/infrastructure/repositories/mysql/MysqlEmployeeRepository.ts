@@ -1,71 +1,72 @@
 import { EmployeeModel } from '@infrastructure/persistence/models/employee.model';
-
 import { EmployeeRepository } from "@/domain/repositories/employee.repository";
 import { EmployeeEntity } from "@/domain/entities/employe.entity";
 
+/**
+ * * Repositorio de employees para MySQL
+ * * Capa de infraestructura que implementa la interfaz EmployeeRepository
+ * * para interactuar con la base de datos MySQL.
+ */
 export class MysqlEmployeeRepository implements EmployeeRepository {
-
   findEmployeeById = async (document: string): Promise<EmployeeEntity | null> => {
     try {
-      const employee = await EmployeeModel.findByPk(document)
+      await EmployeeModel.sync(); // Asegurarse de que la tabla esté sincronizada
+      const employeeModel = await EmployeeModel.findByPk(document);
 
-      if (!employee) return null;
+      if (!employeeModel) return null; // Si no se encuentra el empleado, retornar null
 
-      const employeeData: EmployeeEntity = {
-        documento: employee.dataValues.DOCUMENTO,
-        nombres: employee.dataValues.NOMBRES,
-        nameCargo: employee.dataValues.NOMBRECARGO,
-      }
+      // TODO: Como el modelo del empleado es externo por un ETL, debemos mapearlo a nuestro employee entity
 
-      return employeeData;
+      const employeeEntity: EmployeeEntity = {
+        documento: employeeModel.dataValues.DOCUMENTO,
+        nombres: employeeModel.dataValues.NOMBRES,
+        nameCargo: employeeModel.dataValues.NOMBRECARGO,
+      };
+
+      return employeeEntity
     } catch (error) {
-      console.error(error);
+      console.error('Error finding employee by ID:', error);
       return null;
     }
   }
 
-  findAllEmployees = async (): Promise<EmployeeEntity[] | null> => {
+  findAllEmployees = async (): Promise<EmployeeEntity[] | []> => {
     try {
-      await EmployeeModel.sync();
-      const employees = await EmployeeModel.findAll({
-        order: [['nombres', 'ASC']]
-      });
+      await EmployeeModel.sync(); // Asegurarse de que la tabla esté sincronizada
+      const employees = await EmployeeModel.findAll();
+      if (!employees || employees.length === 0) return []; // Si no hay empleados, retornar un array vacío
 
-      if (!employees || employees.length === 0) return null;
+      // TODO: Como el modelo del empleado es externo por un ETL, debemos mapearlo a nuestro employee entity
 
-      const employeeData: EmployeeEntity[] = employees.map(employee => ({
+      const employeeEntities: EmployeeEntity[] = employees.map(employee => ({
         documento: employee.dataValues.DOCUMENTO,
         nombres: employee.dataValues.NOMBRES,
         nameCargo: employee.dataValues.NOMBRECARGO,
       }));
-
-      return employeeData;
+      return employeeEntities;
     } catch (error) {
-      console.error(error);
-      return null;
+      console.error('Error finding all employees:', error);
+      return [];
     }
   }
 
-  findAllEmployeesByCargo = async (cargo: string): Promise<EmployeeEntity[] | null> => {
+  findAllEmployeesByCargo = async (cargo: string): Promise<EmployeeEntity[] | []> => {
     try {
-      const employees = await EmployeeModel.findAll({
-        where: { CARGO: cargo },
-        order: [['nombres', 'ASC']]
-      });
+      await EmployeeModel.sync(); // Asegurarse de que la tabla esté sincronizada
+      const employees = await EmployeeModel.findAll({ where: { NOMBRECARGO: cargo } });
+      if (!employees || employees.length === 0) return []; // Si no hay empleados con el cargo, retornar un array vacío
 
-      if (!employees || employees.length === 0) return null;
-
-      const employeeData: EmployeeEntity[] = employees.map(employee => ({
+      // TODO: Como el modelo del empleado es externo por un ETL, debemos mapearlo a nuestro employee entity
+      
+      const employeeEntities: EmployeeEntity[] = employees.map(employee => ({
         documento: employee.dataValues.DOCUMENTO,
         nombres: employee.dataValues.NOMBRES,
         nameCargo: employee.dataValues.NOMBRECARGO,
       }));
-
-      return employeeData;
+      return employeeEntities;
     } catch (error) {
-      console.error(error);
-      return null;
+      console.error('Error finding all employees by cargo:', error);
+      return [];
     }
   }
-
 }

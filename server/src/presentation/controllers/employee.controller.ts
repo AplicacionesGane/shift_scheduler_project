@@ -4,19 +4,14 @@ import { Request, Response } from 'express';
 export class EmployeeController {
   constructor(private employeeUseCases: EmployeeUseCases) { }
 
-  public getEmployeeById = async (req: Request, res: Response): Promise<void> => {
-    console.log(req);
-  
+  public getEmployeeByIdCtrl = async (req: Request, res: Response): Promise<void> => {    
     const { documento } = req.params;
-
-    console.log(req.query);
 
     // validar query parameter
     if (!documento || typeof documento !== 'string' || documento.trim() === '') {
       res.status(400).json({ message: 'Document query parameter is required and must be a non-empty string' });
       return;
     }
-
 
     try {
       const employee = await this.employeeUseCases.employeeById(documento);
@@ -31,7 +26,7 @@ export class EmployeeController {
     }
   };
 
-  public getAllEmployees = async (req: Request, res: Response): Promise<void> => {
+  public getAllEmployeesCtrl = async (req: Request, res: Response): Promise<void> => {
     try {
       const employees = await this.employeeUseCases.allEmployees();
       if (!employees || employees.length === 0) {
@@ -45,7 +40,7 @@ export class EmployeeController {
     }
   };
 
-  public getEmployeesByCargo = async (req: Request, res: Response): Promise<void> => {
+  public getEmployeesByCargoCtrl = async (req: Request, res: Response): Promise<void> => {
     const { cargo } = req.params;
 
     if (!cargo || cargo.trim() === '') {
@@ -65,6 +60,4 @@ export class EmployeeController {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-
-
 }
