@@ -1,6 +1,6 @@
 export interface WorkSchedule {
     id: number;
-    employeeDocument: string;
+    employee: string;
     shiftId: string;
     storeId: string;
     assignedDate: string;

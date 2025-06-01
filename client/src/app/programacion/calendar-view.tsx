@@ -196,7 +196,7 @@ function CalendarDay({ date, schedules, isCurrentMonth, month, year }: CalendarD
                 className={"border p-2 rounded-md "+ getBackgroundColor(schedule.status)}
               >
                 <div className="truncate w-full">
-                  <div className="font-medium">{schedule.employeeDocument}</div>
+                  <div className="font-medium">{schedule.employee}</div>
                 </div>
               </article>
             </div>

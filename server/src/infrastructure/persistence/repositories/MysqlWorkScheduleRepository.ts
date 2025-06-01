@@ -5,7 +5,7 @@ import { WorkSchedule } from '@domain/entities/workschedule.entity';
 
 export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
 
-  createNewWorkSchedule = async (newWorkSchedule: WorkScheduleValueDTO): Promise<WorkSchedule> => {
+  save = async (newWorkSchedule: WorkScheduleValueDTO): Promise<WorkSchedule> => {
     try {
       await WorkScheduleModel.sync();
 
@@ -30,7 +30,7 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
     }
   }
 
-  findSchedulesByStoreId = async (id: string): Promise<WorkSchedule[] | null> => {
+  findByStoreId = async (id: string): Promise<WorkSchedule[] | null> => {
     return WorkScheduleModel.findAll({
       where: { storeId: id },
       order: [['assignedDate', 'ASC'], ['createdAt', 'ASC']]
@@ -43,9 +43,10 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
     });
   }
 
-  findScheduleByDocumentAndDate = async (document: string, dateAsing: string): Promise<WorkSchedule | null> => {
+  findByDocumentAndDate = async (document: string, dateAsing: string): Promise<boolean | null> => {
     try {
       const schedule = await WorkScheduleModel.findOne({
+        attributes: ['id'],
         where: {
           employee: document,
           assignedDate: dateAsing
@@ -54,25 +55,14 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
 
       if (!schedule) return null;
 
-      const worSchedule: WorkSchedule = {
-        id: schedule.dataValues.id,
-        employee: schedule.dataValues.employee,
-        shiftId: schedule.dataValues.shiftId,
-        storeId: schedule.dataValues.storeId,
-        assignedDate: schedule.dataValues.assignedDate,
-        status: schedule.dataValues.status,
-        createdAt: schedule.dataValues.createdAt,
-        updatedAt: schedule.dataValues.updatedAt
-      }
-
-      return worSchedule;
+      return schedule.dataValues.id ? true : false;
     } catch (error) {
       console.error('Error finding work schedule by document and date:', error);
       throw new Error('Error finding work schedule by document and date');
     }
   }
 
-  findAllWorksSchedules = async (): Promise<WorkSchedule[] | null> => {
+  findAll = async (): Promise<WorkSchedule[] | null> => {
    try {
       await WorkScheduleModel.sync();
       const workSchedules = await WorkScheduleModel.findAll({

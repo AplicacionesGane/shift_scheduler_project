@@ -35,5 +35,6 @@ const controllers = new WorkScheduleController(usecases);
 routerWorkSchedule.post('/work-schedules', controllers.createWorkSchedule);
 routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedules);
 routerWorkSchedule.get('/work-schedules/:storeId', controllers.getWorkSchedulesByStoreId);
+routerWorkSchedule.get('/work-schedules/:document/:date', controllers.getWorkScheduleByDocumentAndDate);
 
 export { routerWorkSchedule };

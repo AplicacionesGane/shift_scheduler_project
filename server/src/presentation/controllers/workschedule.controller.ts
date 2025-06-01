@@ -1,6 +1,6 @@
 import { WorkScheduleUseCases } from '@application/workschedule/workschedule.usecases';
-import { Request, Response } from 'express';
 import { validateWorkSchedule } from '../schemas/workScheduleSchemaValidate';
+import { Request, Response } from 'express';
 
 export class WorkScheduleController {
   constructor(private readonly workScheduleUseCases: WorkScheduleUseCases) { }
@@ -25,20 +25,16 @@ export class WorkScheduleController {
     }
   }
 
-
   public getAllWorkSchedules = async (req: Request, res: Response) => {
     try {
       const workSchedules = await this.workScheduleUseCases.findAllWorkSchedules();
 
       if (!workSchedules || workSchedules.length === 0) {
-        res.status(404).json({
-          message: 'No work schedules found',
-          data: []
-        });
+        res.status(404).json({ message: 'No work schedules found', error: 'No work schedules found' });
         return;
       }
 
-      res.status(200).json({ data: workSchedules });
+      res.status(200).json(workSchedules);
     } catch (error) {
       console.error('Error retrieving work schedules:', error);
       res.status(500).json({
@@ -73,6 +69,29 @@ export class WorkScheduleController {
         error: 'Internal server error',
         message: 'Error retrieving work schedules by store ID'
       });
+    }
+  }
+
+  public getWorkScheduleByDocumentAndDate = async (req: Request, res: Response) => {
+    const { document, date } = req.params;
+
+    if (!document || !date) {
+      res.status(400).json({
+        error: 'Invalid parameters',
+        message: 'Document and date are required'
+      });
+      return;
+    }
+
+    try {
+      const workSchedule = await this.workScheduleUseCases.findWorkScheduleByDocumentAndDate(document, date);
+      res.status(200).json(workSchedule);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: 'Error on server to retrieve work schedule' });
     }
   }
 
