@@ -18,4 +18,14 @@ export class ShiftUseCases {
   getAllShifts = async (): Promise<Shift[] | null> => {
     return this.shiftRepo.findShiftAll();
   }
+
+  updateShift = async (shiftData: Shift): Promise<Shift> => {
+    const shiftValue = new ShiftValue(shiftData);
+    const updatedShift = await this.shiftRepo.updateShift(shiftValue);
+    return updatedShift;
+  }
+
+  deleteShift = async (id: string): Promise<void> => {
+    await this.shiftRepo.deleteShift(id);
+  }
 }

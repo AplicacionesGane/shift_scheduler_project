@@ -28,7 +28,9 @@ const controllers = new ShiftController(usecases);
  */
 
 routerShift.post('/shifts', controllers.registerCtrl);
+routerShift.put('/shifts', controllers.updateCtrl);
 routerShift.get('/shifts', controllers.getAllCtrl);
 routerShift.get('/shifts/:id', controllers.getOneCtrl);
+routerShift.delete('/shifts/:id', controllers.deleteCtrl);
 
 export { routerShift };

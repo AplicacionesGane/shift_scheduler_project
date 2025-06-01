@@ -18,6 +18,7 @@ export class MysqlShiftRepository implements ShiftRepository {
       throw new Error('Error saving shift');
     }
   }
+
   findShiftById = async (id: string): Promise<Shift | null> => {
     try {
       await ShiftModel.sync(); // Asegurarse de que la tabla esté sincronizada
@@ -29,6 +30,7 @@ export class MysqlShiftRepository implements ShiftRepository {
       return null;
     }
   }
+
   findShiftAll = async (): Promise<Shift[] | []> => {
     try {
       await ShiftModel.sync(); // Asegurarse de que la tabla esté sincronizada
@@ -39,6 +41,43 @@ export class MysqlShiftRepository implements ShiftRepository {
       console.error('Error finding all shifts:', error);
       return [];
 
+    }
+  }
+
+  updateShift = async (shift: Shift): Promise<Shift> =>{
+    try {
+      const shiftModel = await ShiftModel.findByPk(shift.id);
+
+      if (!shiftModel) {
+        throw new Error('Shift not found');
+      }
+
+      const updateShift = await shiftModel.update({
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        nameTurno: shift.nameTurno,
+        description: shift.description
+      });
+
+      return updateShift;
+    } catch (error) {
+      console.error('Error updating shift:', error);
+      throw new Error('Error updating shift');
+    }
+  }
+
+  deleteShift = async (id: string): Promise<void> => {
+    try {
+      const shiftModel = await ShiftModel.findByPk(id);
+
+      if (!shiftModel) {
+        throw new Error('Shift not found');
+      }
+      
+      await shiftModel.destroy();
+    } catch (error) {
+      console.error('Error deleting shift:', error);
+      throw new Error('Error deleting shift');
     }
   }
 
