@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useProgramacion } from './useProgramacion';
 import { useCalendar } from './useCalendar';
-import { useShiftsContext } from '@/contexts/ShiftsContext';
+import { useShiftsStore } from '@/stores/shiftsStore';
 import { useFormValidation } from './useFormValidation';
 
 const currentYear = new Date().getFullYear();
@@ -13,7 +13,7 @@ export const useProgramacionCalendar = () => {
   
   const { workSchedules, loading, error, fetchSchedules, clearSchedules } = useProgramacion();
   const { calendarDays, summary } = useCalendar(year, month, workSchedules);
-  const { preloadShifts } = useShiftsContext();
+  const preloadShifts = useShiftsStore((state) => state.preloadShifts);
   const { validateForm } = useFormValidation({ year, month, sucursal, clearSchedules });
 
   // Precargar turnos únicos cuando se cargan las programaciones

@@ -1,12 +1,13 @@
 import { memo } from 'react';
-import { useShiftsContext } from '@/contexts/ShiftsContext';
+import { useShiftsStore } from '@/stores/shiftsStore';
 
 interface ShiftCardProps {
   shiftId: string;
 }
 
 export const ShiftCard = memo(({ shiftId }: ShiftCardProps) => {
-  const { shiftsCache, isLoading } = useShiftsContext();
+  const shiftsCache = useShiftsStore((state) => state.shiftsCache);
+  const isLoading = useShiftsStore((state) => state.isLoading);
   const shift = shiftsCache[shiftId];
 
   if (isLoading(shiftId)) {

@@ -6,18 +6,18 @@ import Programacion from "@/app/programacion";
 import Root from "@/routes/root";
 
 export const RouterMain = createBrowserRouter([
-    {
-        path: "/",
-        element: <Root />,
-        children: [
-            {
-                index: true,
-                element: <Dashboard />
-            },
-            {
-                path: "programacion",
-                element: <Programacion />
-            }
-        ]
-    }
+  {
+    path: "/",
+    element: <Root />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />
+      },
+      {
+        path: "programacion",
+        element: <Programacion />
+      }
+    ]
+  }
 ])
