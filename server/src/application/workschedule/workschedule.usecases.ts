@@ -70,6 +70,12 @@ export class WorkScheduleUseCases {
     }
   }
 
+  findWorkScheduleByShiftId = async (shiftId: string): Promise<boolean> => {
+    const workSchedule = await this.workScheduleRepo.findWorkScheduleByshiftId(shiftId);
+    if (!workSchedule) throw new Error(`No work schedule found for shift with id ${shiftId}`);
+    return workSchedule;
+  }
+
   findAllWorkSchedules = async (): Promise<WorkSchedule[] | null> => {
     const workSchedules = await this.workScheduleRepo.findAll();
     if (!workSchedules || workSchedules.length === 0) throw new Error('No work schedules found');

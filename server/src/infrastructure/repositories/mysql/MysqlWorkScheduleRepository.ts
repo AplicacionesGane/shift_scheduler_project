@@ -37,6 +37,16 @@ export class MysqlWorkScheduleRepository implements WorkScheduleRepository {
     }
   }
 
+  findWorkScheduleByshiftId = async (idShift: string): Promise<boolean> => {
+    try {
+      const workSchedule = await WorkScheduleModel.findOne({ where: { shiftId: idShift } });
+      return workSchedule !== null;
+    } catch (error) {
+      console.error('Error finding work schedule by shift ID:', error);
+      throw new Error('Error finding work schedule by shift ID');
+    }
+  }
+
   findByStoreYearMonth = async (idStore: string, year: number, month: number): Promise<WorkSchedule[] | []> => {
     try {
       await WorkScheduleModel.sync();

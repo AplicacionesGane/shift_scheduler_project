@@ -71,13 +71,7 @@ export class MysqlShiftRepository implements ShiftRepository {
 
   deleteShift = async (id: string): Promise<void> => {
     try {
-      const shiftModel = await ShiftModel.findByPk(id);
-
-      if (!shiftModel) {
-        throw new Error('Shift not found');
-      }
-      
-      await shiftModel.destroy();
+      await ShiftModel.destroy({ where: { id } });
     } catch (error) {
       console.error('Error deleting shift:', error);
       throw new Error('Error deleting shift');

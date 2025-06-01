@@ -1,7 +1,10 @@
 import { MysqlShiftRepository } from '@/infrastructure/repositories/mysql/MysqlShiftRepository';
+import { MysqlWorkScheduleRepository } from '@/infrastructure/repositories/mysql/MysqlWorkScheduleRepository';
+
+
+import { ShiftUseCases } from '@application/shifts/shift.usecases';
 
 import { ShiftController } from '@presentation/controllers/shift.controller';
-import { ShiftUseCases } from '@application/shifts/shift.usecases';
 import { Router } from 'express';
 
 const routerShift = Router();
@@ -12,11 +15,12 @@ const routerShift = Router();
  * * para realizar las operaciones CRUD de los turnos.
  */
 const repository = new MysqlShiftRepository();
+const workScheduleRepository = new MysqlWorkScheduleRepository();
 
 /**
  * iniciamos casos de uso
  */
-const usecases = new ShiftUseCases(repository);
+const usecases = new ShiftUseCases(repository, workScheduleRepository);
 
 /**
  * iniciamos los controladores
