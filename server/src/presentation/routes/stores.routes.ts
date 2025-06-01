@@ -27,7 +27,8 @@ const controllers = new StoreController(usecases);
  * Definir rutas
  */
 
-routerStores.get('/stores', controllers.getAllStores);
-routerStores.get('/stores/:id', controllers.getStoreById);
+routerStores.get('/stores', controllers.getAllStoresCtrl);
+routerStores.get('/stores/:id', controllers.getStoreByIdCtrl);
+routerStores.get('/stores/company/:company', controllers.getStoresByCompanyCtrl);
 
 export { routerStores }
