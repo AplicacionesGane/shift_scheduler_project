@@ -8,6 +8,12 @@ export function useAsingSchedule() {
   const [id, setId] = useState<string>("");
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
   const [vendedora, setVendedora] = useState<Vendedora>();
+  
+  // Calendar state
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [selectedDates, setSelectedDates] = useState<Set<number>>(new Set());
+  const [vendedoraDocument, setVendedoraDocument] = useState<string>("");
 
   const previousId = useRef<string>(id);
   
@@ -33,15 +39,111 @@ export function useAsingSchedule() {
     try {
       const vendedoraData = await getVendedoraByDocument(document);
       setVendedora(vendedoraData);
+      setVendedoraDocument(document);
     } catch (error) {
       console.error("Error al cargar la vendedora:", error);
     }
   }
+
+  // Calendar functions
+  const toggleDate = useCallback((date: number) => {
+    setSelectedDates(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(date)) {
+        newSet.delete(date);
+      } else {
+        newSet.add(date);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const clearSelectedDates = useCallback(() => {
+    setSelectedDates(new Set());
+  }, []);
+
+  const getDaysInMonth = useCallback((year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  }, []);
+
+  const getFirstDayOfMonth = useCallback((year: number, month: number) => {
+    return new Date(year, month, 1).getDay();
+  }, []);
+
+  const isValidAssignmentDate = useCallback((date: number) => {
+    const today = new Date();
+    const selectedDate = new Date(selectedYear, selectedMonth, date);
+    return selectedDate >= today;
+  }, [selectedYear, selectedMonth]);
+
+  // Assignment confirmation
+  const confirmAssignment = useCallback(async () => {
+    if (!store || !vendedora || !selectedShift || selectedDates.size === 0) {
+      alert("Por favor completa todos los pasos antes de confirmar la asignación");
+      return false;
+    }
+
+    try {
+      // Aquí puedes implementar la lógica para enviar los datos al servidor
+      const assignmentData = {
+        storeId: store.sucursal,
+        shiftId: selectedShift,
+        employeeDocument: vendedoraDocument,
+        dates: Array.from(selectedDates).map(day => ({
+          day,
+          month: selectedMonth,
+          year: selectedYear
+        }))
+      };
+
+      console.log("Datos de asignación:", assignmentData);
+      alert("¡Asignación confirmada exitosamente!");
+      
+      // Reset form after successful assignment
+      setSelectedDates(new Set());
+      setVendedora(undefined);
+      setStore(undefined);
+      setSelectedShift(null);
+      setId("");
+      setVendedoraDocument("");
+      
+      return true;
+    } catch (error) {
+      console.error("Error al confirmar asignación:", error);
+      alert("Error al procesar la asignación. Inténtalo de nuevo.");
+      return false;
+    }
+  }, [store, vendedora, selectedShift, selectedDates, vendedoraDocument, selectedMonth, selectedYear]);
 
   useEffect(() => {
     getShifts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { store, getStores, shifts, getVendedora, vendedora, id, setId, selectedShift, setSelectedShift, getShifts };
+  return { 
+    store, 
+    getStores, 
+    shifts, 
+    getVendedora, 
+    vendedora, 
+    id, 
+    setId, 
+    selectedShift, 
+    setSelectedShift, 
+    getShifts,
+    // Calendar functionality
+    selectedYear,
+    setSelectedYear,
+    selectedMonth,
+    setSelectedMonth,
+    selectedDates,
+    toggleDate,
+    clearSelectedDates,
+    getDaysInMonth,
+    getFirstDayOfMonth,
+    isValidAssignmentDate,
+    vendedoraDocument,
+    // Assignment confirmation
+    confirmAssignment
+  };
 }
