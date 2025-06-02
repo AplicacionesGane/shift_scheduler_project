@@ -1,49 +1,93 @@
-import { CalendarGrid, CalendarHeader, SearchForm } from "./components";
-import { useCalendar } from "@/hooks/useCalendar";
+import { useEffect, useState, type FormEvent } from 'react';
+import { API_SERVER_URL } from '@/utils/constants';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@radix-ui/react-label';
 import { Card } from "@/components/ui/card";
+import axios from 'axios';
 
-export default function Programacion() {
-  const { handleChangeFun, handleSubmit, data } = useCalendar();
+interface MonthData {
+  years: number[];
+  months: { numero: number, nameMonth: string }[]
+}
+
+export default function CalendarProgramer() {
+  const [dataDates, setDataDates] = useState<MonthData | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedMonth, setSelectedMonth] = useState<string>("")
+  const [sucursal, setSucursal] = useState<string>("")
+
+  useEffect(() => {
+    axios.get(`${API_SERVER_URL}/calendar/years-months`)
+      .then(res => setDataDates(res.data))
+      .catch(err => console.log(err))
+  }, [])
+
+  const handleSubmit = (ev: FormEvent) => {
+    ev.preventDefault()
+
+    if(!sucursal || sucursal.trim() === ""){
+      alert('faltan datos')
+      return
+    }
+
+    axios.get(`${API_SERVER_URL}/calendar/year/${selectedYear}/month/${selectedMonth}`)
+      .then(res => console.log(res.data.data))
+      .catch(err => console.log(err))
+
+    axios.get(`${API_SERVER_URL}/work-schedules/${sucursal}/${selectedYear}/${selectedMonth}`)
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err))
+  }
 
   return (
-    <section className="p-4">
-      <SearchForm  funHandleChange={handleChangeFun} submitForm={handleSubmit} />
+    <>
+      <Card className="p-4">
+        <form className='flex items-center gap-2' onSubmit={handleSubmit}>
+          <Label>Año: </Label>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="ml-2 p-2 border rounded"
+          >
+            <option value="">Seleccionar Año</option>
+            {
+              dataDates && dataDates.years?.map((n, index) => (
+                <option key={index} value={n.toString()}>
+                  {n}
+                </option>
+              ))
+            }
+          </select>
 
-      {/* Calendario */}
-      {data && data.length > 0 ? (
-        <div className="mt-4">
-          {/* Header del calendario con navegación e información */}
-          <CalendarHeader 
-            calendarDays={data}
-            onPreviousMonth={() => {
-              // TODO: Implementar navegación al mes anterior
-              console.log('Navegar a mes anterior');
-            }}
-            onNextMonth={() => {
-              // TODO: Implementar navegación al mes siguiente  
-              console.log('Navegar a mes siguiente');
-            }}
-            onGoToday={() => {
-              // TODO: Implementar ir al día de hoy
-              console.log('Ir a hoy');
-            }}
+          <Label>Mes: </Label>
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="ml-2 p-2 border rounded"
+          >
+            {
+              dataDates && dataDates.months?.map((n, index) => (
+                <option key={index} value={n.numero.toString()}>
+                  {n.nameMonth}
+                </option>
+              ))
+            }
+
+          </select>
+
+          <Label>Sucursal: </Label>
+          <Input  
+            value={sucursal}
+            onChange={e => setSucursal(e.target.value)}
+            className='w-44'
           />
 
-          {/* Grid del calendario */}
-          <Card className="p-4">
-            <CalendarGrid calendarDays={data} />
-          </Card>
-        </div>
-      ) : (
-        /* Mensaje cuando no hay datos */
-        <Card className="mt-4 p-8 text-center">
-          <div className="text-gray-500">
-            <div className="text-4xl mb-2">📅</div>
-            <h3 className="text-lg font-medium mb-2">No hay datos de calendario</h3>
-            <p>Selecciona un año y mes para ver el calendario</p>
-          </div>
-        </Card>
-      )}
-    </section>
-  );
+          <Button type='submit'>
+            Buscar
+          </Button>
+        </form>
+      </Card>
+    </>
+  )
 }
