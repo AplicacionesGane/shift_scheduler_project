@@ -17,6 +17,13 @@ export class MysqlStoreRepository implements StoreRepository {
         nombre: store.dataValues.NOMBRE,
         direccion: store.dataValues.DIRECCION,
         estado: store.dataValues.ESTADO,
+        categoria: store.dataValues.CATEGORIA,
+        celula: store.dataValues.CELULA,
+        horaEntrada: store.dataValues.HORA_ENTRADA,
+        horaSalida: store.dataValues.HORA_SALIDA,
+        horaEntradaFest: store.dataValues.HORA_ENTRADA_FES,
+        horaSalidaFest: store.dataValues.HORA_SALIDA_FES,
+        region: store.dataValues.SUBZONA
       }));
 
       return storeEntities;
@@ -38,6 +45,13 @@ export class MysqlStoreRepository implements StoreRepository {
         nombre: store.dataValues.NOMBRE,
         direccion: store.dataValues.DIRECCION,
         estado: store.dataValues.ESTADO,
+        categoria: store.dataValues.CATEGORIA,
+        celula: store.dataValues.CELULA,
+        horaEntrada: store.dataValues.HORA_ENTRADA,
+        horaSalida: store.dataValues.HORA_SALIDA,
+        horaEntradaFest: store.dataValues.HORA_ENTRADA_FES,
+        horaSalidaFest: store.dataValues.HORA_SALIDA_FES,
+        region: store.dataValues.SUBZONA
       };
     } catch (error) {
       console.error('Error fetching store by ID:', error);
@@ -58,6 +72,13 @@ export class MysqlStoreRepository implements StoreRepository {
         nombre: store.dataValues.NOMBRE,
         direccion: store.dataValues.DIRECCION,
         estado: store.dataValues.ESTADO,
+        categoria: store.dataValues.CATEGORIA,
+        celula: store.dataValues.CELULA,
+        horaEntrada: store.dataValues.HORA_ENTRADA,
+        horaSalida: store.dataValues.HORA_SALIDA,
+        horaEntradaFest: store.dataValues.HORA_ENTRADA_FES,
+        horaSalidaFest: store.dataValues.HORA_SALIDA_FES,
+        region: store.dataValues.SUBZONA
       }));
       
       return storeEntities;

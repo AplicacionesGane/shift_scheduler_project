@@ -47,4 +47,11 @@ export interface Store {
     nombre: string;
     direccion: string;
     estado: string | null;
+    categoria: string;
+    celula: string;
+    horaEntrada: string;
+    horaSalida: string;
+    horaEntradaFest: string;
+    horaSalidaFest: string;
+    region: string;
 }

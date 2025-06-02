@@ -4,4 +4,11 @@ export interface StoreEntity {
     nombre: string;
     direccion: string;
     estado: string | null;
+    region: string;
+    celula: string;
+    horaEntrada: string;
+    horaSalida: string;
+    horaEntradaFest: string;
+    horaSalidaFest: string;
+    categoria: string
 }
