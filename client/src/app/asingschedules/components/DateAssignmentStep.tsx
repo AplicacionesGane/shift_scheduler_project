@@ -55,6 +55,8 @@ export const DateAssignmentStep = memo((props: DateAssignmentStepProps) => {
 
   const canShowAssignmentSummary = store && vendedora && selectedShift && selectedDates.size > 0;
 
+  console.log(selectedMonth);
+
   return (
     <Card className="p-6">
       <div className="space-y-6 col-span-1 px-8 py-6">

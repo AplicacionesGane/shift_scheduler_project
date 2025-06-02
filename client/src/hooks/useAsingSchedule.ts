@@ -1,4 +1,5 @@
 import { searchStoreById, getAllShifts, getVendedoraByDocument } from '@/services/stores.service';
+import { assignScheduleService } from '@/services/asingSchedule.service';
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Shift, Store, Vendedora } from "@/types/Interfaces";
 
@@ -11,7 +12,7 @@ export function useAsingSchedule() {
   
   // Calendar state
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1); // Mes actual (1-12)
   const [selectedDates, setSelectedDates] = useState<Set<number>>(new Set());
   const [vendedoraDocument, setVendedoraDocument] = useState<string>("");
 
@@ -76,7 +77,7 @@ export function useAsingSchedule() {
     return selectedDate >= today;
   }, [selectedYear, selectedMonth]);
 
-  // Assignment confirmation
+  // TODO: Assignment confirmation
   const confirmAssignment = useCallback(async () => {
     if (!store || !vendedora || !selectedShift || selectedDates.size === 0) {
       alert("Por favor completa todos los pasos antes de confirmar la asignación");
@@ -84,7 +85,6 @@ export function useAsingSchedule() {
     }
 
     try {
-      // Aquí puedes implementar la lógica para enviar los datos al servidor
       const assignmentData = {
         storeId: store.sucursal,
         shiftId: selectedShift,
@@ -96,21 +96,44 @@ export function useAsingSchedule() {
         }))
       };
 
-      console.log("Datos de asignación:", assignmentData);
-      alert("¡Asignación confirmada exitosamente!");
+      const result = await assignScheduleService(assignmentData);
       
-      // Reset form after successful assignment
-      setSelectedDates(new Set());
-      setVendedora(undefined);
-      setStore(undefined);
-      setSelectedShift(null);
-      setId("");
-      setVendedoraDocument("");
+      // Crear mensaje resumido
+      let message = `Resumen de asignación:\n`;
+      message += `• Total: ${result.total} fechas\n`;
+      message += `• Exitosas: ${result.successful}\n`;
+      message += `• Fallidas: ${result.failed}\n`;
       
-      return true;
+      if (result.successful > 0) {
+        message += `\n✅ Fechas asignadas: ${result.successfulDates.join(', ')}`;
+      }
+      
+      if (result.failed > 0) {
+        message += `\n❌ Fechas fallidas:\n`;
+        result.failedDates.forEach(failure => {
+          message += `  • ${failure.date}: ${failure.error}\n`;
+        });
+      }
+
+      alert(message);
+      
+      // Solo resetear el formulario si todas las asignaciones fueron exitosas
+      if (result.failed === 0) {
+        setSelectedDates(new Set());
+        setVendedora(undefined);
+        setStore(undefined);
+        setSelectedShift(null);
+        setId("");
+        setVendedoraDocument("");
+        return true;
+      }
+      
+      // Si hubo fallos, mantener los datos para reintentar
+      return result.failed === 0;
+
     } catch (error) {
       console.error("Error al confirmar asignación:", error);
-      alert("Error al procesar la asignación. Inténtalo de nuevo.");
+      alert("Error crítico al procesar la asignación. Inténtalo de nuevo.");
       return false;
     }
   }, [store, vendedora, selectedShift, selectedDates, vendedoraDocument, selectedMonth, selectedYear]);
