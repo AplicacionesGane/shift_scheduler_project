@@ -6,16 +6,34 @@ import { Label } from '@radix-ui/react-label';
 import { Card } from "@/components/ui/card";
 import axios from 'axios';
 
+interface DayCalendar {
+  id: string
+  days: number
+  nameDay: string
+  month: number
+  nameMonth: string
+  year: number
+  isHoliday: false
+  isWeekend: false
+  holidayDescription: string | null
+  updatedAt: string
+  createdAt: string
+}
+
 interface MonthData {
   years: number[];
   months: { numero: number, nameMonth: string }[]
 }
+
+const daysNames = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabados", ]
 
 export default function CalendarProgramer() {
   const [dataDates, setDataDates] = useState<MonthData | null>(null);
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>("")
   const [sucursal, setSucursal] = useState<string>("")
+
+  const [daysCalendar, setDayCalendar] = useState<DayCalendar[]>([])
 
   useEffect(() => {
     axios.get(`${API_SERVER_URL}/calendar/years-months`)
@@ -26,19 +44,52 @@ export default function CalendarProgramer() {
   const handleSubmit = (ev: FormEvent) => {
     ev.preventDefault()
 
-    if(!sucursal || sucursal.trim() === ""){
+    if (!sucursal || sucursal.trim() === "") {
       alert('faltan datos')
       return
     }
 
     axios.get(`${API_SERVER_URL}/calendar/year/${selectedYear}/month/${selectedMonth}`)
-      .then(res => console.log(res.data.data))
+      .then(res => { console.log(res.data.data); setDayCalendar(res.data.data) })
       .catch(err => console.log(err))
 
     axios.get(`${API_SERVER_URL}/work-schedules/${sucursal}/${selectedYear}/${selectedMonth}`)
       .then(res => console.log(res.data))
       .catch(err => console.log(err))
   }
+
+  // Función para generar el calendario con espacios vacíos
+  const generateCalendarGrid = () => {
+    if (!daysCalendar.length) return [];
+
+    // Obtener el primer día del mes y calcular espacios vacíos
+    const firstDay = new Date(parseInt(selectedYear), parseInt(selectedMonth) - 1, 1);
+    const firstDayOfWeek = firstDay.getDay(); // 0 = domingo, 1 = lunes, etc.
+
+    // Crear espacios vacíos al inicio
+    const emptySlots = Array(firstDayOfWeek).fill(null);
+
+    const dayMap = emptySlots.map((d): DayCalendar => {
+      return {
+        id: Math.random().toString(),
+        days: d,
+        year: 2025,
+        isHoliday: false,
+        isWeekend: false,
+        month: 6,
+        holidayDescription: null,
+        nameDay: "   ",
+        nameMonth: "   ",
+        createdAt: "   ",
+        updatedAt: "   ",
+      }
+    })
+
+    // Combinar espacios vacíos con días del mes
+    return [...dayMap, ...daysCalendar];
+  };
+
+  const renderDay = generateCalendarGrid()
 
   return (
     <>
@@ -77,7 +128,7 @@ export default function CalendarProgramer() {
           </select>
 
           <Label>Sucursal: </Label>
-          <Input  
+          <Input
             value={sucursal}
             onChange={e => setSucursal(e.target.value)}
             className='w-44'
@@ -87,6 +138,30 @@ export default function CalendarProgramer() {
             Buscar
           </Button>
         </form>
+      </Card>
+
+      {/** Renderizar Calendario */}
+      <Card className=''>
+
+        <header className='grid grid-cols-7'>
+          {daysNames.map((day, i) => (
+            <article key={i + 1}>
+              {day}
+            </article>
+          ))}
+        </header>
+
+        <main className='grid grid-cols-7'>
+          {
+            renderDay?.map(c => (
+              <article key={c.id}>
+                <p>{c.days}</p>
+                <p>{c.isHoliday}</p>
+                <p>{c.nameDay}</p>
+              </article>
+            ))
+          }
+        </main>
       </Card>
     </>
   )
