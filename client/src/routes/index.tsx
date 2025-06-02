@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router";
 
 import Configuracion from "@/app/configuracion";
+import AsingSchedules from "@/app/asingschedules";
 import Programacion from "@/app/programacion";
 import Employees from "@/app/employees";
 import Dashboard from "@/app/dashboard";
@@ -32,6 +33,10 @@ export const RouterMain = createBrowserRouter([
       {
         path: "shifts",
         element: <Shifts />
+      },
+      {
+        path: "asing-schedules",
+        element: <AsingSchedules />
       }
     ]
   }

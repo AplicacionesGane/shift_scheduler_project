@@ -1,4 +1,4 @@
-import { Calendar, Users, Settings, Home, LogOut, Sun } from "lucide-react";
+import { Calendar, Users, Settings, Home, LogOut, Sun, ArrowBigRightDashIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
@@ -6,7 +6,8 @@ export function NavBar() {
 
   const menuItems = [
     { icon: Home, label: "Dashboard", href: "/" },
-    { icon: Calendar, label: "Programación", href: "/programacion" },
+    { icon: Calendar, label: "Calendario", href: "/programacion" },
+    { icon: ArrowBigRightDashIcon, label: "Asignar Turnos", href: "/asing-schedules" },
     { icon: Sun, label: "Turnos", href: "/shifts" },
     { icon: Users, label: "Empleados", href: "/employees" },
     { icon: Settings, label: "Configuración", href: "/config" },

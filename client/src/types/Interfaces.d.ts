@@ -40,3 +40,11 @@ export interface DateRange {
     month: number; // 1-12
     year: number; // Año
 }
+
+export interface Store {
+    empresa: string;
+    sucursal: string;
+    nombre: string;
+    direccion: string;
+    estado: string | null;
+}

@@ -30,8 +30,6 @@ const usecases = new WorkScheduleUseCases(
 // Iniciar los controllers
 const controllers = new WorkScheduleController(usecases);
 
-
-
 routerWorkSchedule.post('/work-schedules', controllers.createWorkScheduleCtrl);
 routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedulesCtrl);
 routerWorkSchedule.get('/work-schedules/:storeId/:year/:month', controllers.findByStoreIdWhitMonthAndYearCtrl);
