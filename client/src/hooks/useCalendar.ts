@@ -1,4 +1,5 @@
-import type { Shift } from "@/types/Interfaces";
+import { getCalendarByMonth } from "@/services/calendar.service";
+import type { CalendarInterface, Shift } from "@/types/Interfaces";
 import { useState } from "react";
 
 export const useCalendar = () => {
@@ -8,27 +9,29 @@ export const useCalendar = () => {
 
   const [shifts, setShifts] = useState<Shift[] | []> ([])
 
+  const [data, setData] = useState<CalendarInterface[]>([]); // Adjust type as needed
 
-  const handleYearOrMonthChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = ev.target;
+  const handleChangeFun = (name: string, value: string) => {
+    const setters = {
+      year: (value: string) => setYear(value ? parseInt(value) : null),
+      month: (value: string) => setSelectedMonth(value ? parseInt(value) : null),
+      sucursal: (value: string) => setSucursal(value)
+    };
 
-    console.log(`Handling change for ${name} with value: ${value}`);
-
-    if (name === "year") {
-      setYear(value ? parseInt(value) : null);
-    } else if (name === "month") {
-      setSelectedMonth(value ? parseInt(value) : null);
-    } else if (name === "sucursal") {
-      setSucursal(value);
-    }
+    setters[name as keyof typeof setters]?.(value);
   }
 
-  const handleSucursalChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
 
-  console.log("Handling sucursal change:", ev.target.value);
+    try {
+      const response = await getCalendarByMonth(selectedYear!, selectedMonth!);
+      setData(response);
+    } catch (error) {
+      console.error("Error fetching calendar data:", error);
+    }
 
-    setSucursal(ev.target.value);
-  };
+  }
 
 
  return {
@@ -36,9 +39,10 @@ export const useCalendar = () => {
     selectedMonth,
     sucursal,
     shifts,
+    data,
     setShifts,
-    handleYearOrMonthChange,
-    handleSucursalChange
+    handleChangeFun,
+    handleSubmit
  }
 
 };

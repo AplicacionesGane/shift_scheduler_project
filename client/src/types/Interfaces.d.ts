@@ -61,3 +61,30 @@ export interface Vendedora {
     nombres: string;
     nameCargo: string;
 }
+
+export interface ResDataByYears {
+  years: number[];
+  months: { numero: number; nameMonth: string }[];
+}
+
+export interface CalendarInterface {
+  id: string
+  year: number
+  month: number
+  days: number
+  isHoliday: boolean
+  isWeekend: boolean
+  nameDay: string
+  nameMonth: string
+  holidayDescription: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ResponseDataCalendar {
+    success: boolean;
+    message: string;
+    data: CalendarInterface[];
+    error?: string | null;
+    count?: number;
+}
