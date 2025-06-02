@@ -11,7 +11,7 @@ export function useAsingSchedule() {
   
   // Calendar state
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
   const [selectedDates, setSelectedDates] = useState<Set<number>>(new Set());
   const [vendedoraDocument, setVendedoraDocument] = useState<string>("");
 
