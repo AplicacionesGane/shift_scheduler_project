@@ -15,7 +15,6 @@ interface DateAssignmentStepProps {
   selectedMonth: number;
   selectedDates: Set<number>;
   vendedoraDocument: string;
-  onYearChange: (year: number) => void;
   onMonthChange: (month: number) => void;
   onDateToggle: (date: number) => void;
   onClearDates: () => void;
@@ -35,7 +34,6 @@ export const DateAssignmentStep = memo((props: DateAssignmentStepProps) => {
     selectedMonth,
     selectedDates,
     vendedoraDocument,
-    onYearChange,
     onMonthChange,
     onDateToggle,
     onClearDates,
@@ -65,7 +63,6 @@ export const DateAssignmentStep = memo((props: DateAssignmentStepProps) => {
         <YearMonthSelector
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
-          onYearChange={onYearChange}
           onMonthChange={onMonthChange}
           monthNames={monthNames}
         />
@@ -80,14 +77,12 @@ export const DateAssignmentStep = memo((props: DateAssignmentStepProps) => {
             if (direction === 'prev') {
               if (selectedMonth === 0) {
                 onMonthChange(11);
-                onYearChange(selectedYear - 1);
               } else {
                 onMonthChange(selectedMonth - 1);
               }
             } else {
               if (selectedMonth === 11) {
                 onMonthChange(0);
-                onYearChange(selectedYear + 1);
               } else {
                 onMonthChange(selectedMonth + 1);
               }
@@ -138,34 +133,21 @@ const StepHeader = memo(({ storeName }: { storeName?: string }) => (
 const YearMonthSelector = memo(({ 
   selectedYear, 
   selectedMonth, 
-  onYearChange, 
   onMonthChange, 
   monthNames 
 }: {
   selectedYear: number;
   selectedMonth: number;
-  onYearChange: (year: number) => void;
   onMonthChange: (month: number) => void;
   monthNames: string[];
 }) => (
   <div className="grid grid-cols-2 gap-4 mb-6">
     <div>
       <Label className="text-sm font-medium text-gray-700 mb-2 block">Año</Label>
-      <Select value={selectedYear.toString()} onValueChange={(value) => onYearChange(parseInt(value))}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Seleccionar año" />
-        </SelectTrigger>
-        <SelectContent>
-          {[...Array(5)].map((_, i) => {
-            const year = new Date().getFullYear() + i;
-            return (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+      <div className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 flex items-center text-sm font-medium text-gray-700">
+        {selectedYear}
+      </div>
+      <p className="text-xs text-gray-500 mt-1">Año actual fijo</p>
     </div>
     
     <div>

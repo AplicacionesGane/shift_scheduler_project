@@ -38,7 +38,6 @@ const AsingSchedules: React.FC = () => {
     id, 
     setSelectedShift,
     selectedYear,
-    setSelectedYear,
     selectedMonth,
     setSelectedMonth,
     toggleDate,
@@ -140,7 +139,6 @@ const AsingSchedules: React.FC = () => {
             selectedMonth={selectedMonth}
             selectedDates={selectedDates}
             vendedoraDocument={vendedoraDocument}
-            onYearChange={setSelectedYear}
             onMonthChange={setSelectedMonth}
             onDateToggle={toggleDate}
             onClearDates={clearSelectedDates}
@@ -169,7 +167,6 @@ const AsingSchedules: React.FC = () => {
     handleShiftSelect, 
     handleSubmitVendedora, 
     handleConfirmAssignment,
-    setSelectedYear,
     setSelectedMonth,
     toggleDate,
     clearSelectedDates,
