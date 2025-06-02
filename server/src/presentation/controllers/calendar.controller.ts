@@ -440,4 +440,17 @@ export class CalendarController {
       });
     }
   };
+
+  public getYearsAndMonthsCtrl = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const result = await this.calendarUseCases.getYearsAndMonths();
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error getting years and months:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Internal server error' 
+      });
+    }
+  }
 }

@@ -1,6 +1,7 @@
-import { CalendarRepository } from "@domain/repositories/calendar.repository";
+import { CalendarRepository, ResDataByYears } from "@domain/repositories/calendar.repository";
 import { CalendarModel } from "@infrastructure/persistence/models/calendar.model";
 import { Calendar } from "@domain/entities/calendar.entity";
+import { fn, QueryTypes } from "sequelize";
 
 export class CalendarRepoMysql implements CalendarRepository {
     
@@ -84,6 +85,38 @@ export class CalendarRepoMysql implements CalendarRepository {
         } catch (error) {
             console.error('Error finding calendar by date:', error);
             throw new Error('Error finding calendar by date from database');
+        }
+    }
+
+    async findYearsAndMonths(): Promise<ResDataByYears> {
+        try {
+            const years = await CalendarModel.sequelize?.query(
+                'SELECT DISTINCT year FROM CALENDAR ORDER BY year',
+                { type: QueryTypes.SELECT }
+            );
+            const months = await CalendarModel.sequelize?.query(
+                'SELECT DISTINCT month, nameMonth FROM CALENDAR ORDER BY month',
+                { type: QueryTypes.SELECT }
+            );
+            
+            if (!years || !months) {
+                throw new Error('No calendar data found');
+            }
+
+            const formattedYears = years.map((year: any) => year.year);
+            const formattedMonths = months.map((month: any) => ({
+                numero: month.month,
+                nameMonth: month.nameMonth
+            }));
+
+            return {
+                years: formattedYears,
+                months: formattedMonths
+            };
+
+        } catch (error) {
+            console.error('Error finding years and months:', error);
+            throw new Error('Error finding years and months from database');
         }
     }
 

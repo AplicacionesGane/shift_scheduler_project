@@ -29,6 +29,7 @@ routerCalendar.post('/calendar/year', controllers.createCalendarByYearCtrl);
 routerCalendar.get('/calendar/year/:year', controllers.getCalendarByYearCtrl);
 routerCalendar.get('/calendar/year/:year/month/:month', controllers.getCalendarByYearAndMonthCtrl);
 routerCalendar.get('/calendar/date/:year/:month/:day', controllers.getDateInfoCtrl);
+routerCalendar.get('/calendar/years-months', controllers.getYearsAndMonthsCtrl);
 
 // Holiday management routes
 routerCalendar.post('/calendar/holiday', controllers.addManualHolidayCtrl);

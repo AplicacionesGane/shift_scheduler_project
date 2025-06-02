@@ -1,6 +1,6 @@
-import { Calendar } from '@domain/entities/calendar.entity';
-import { CalendarRepository } from '@domain/repositories/calendar.repository';
 import { CalendarDomainService, ICalendarDomainService } from '@domain/services/CalendarDomainService';
+import { CalendarRepository, type ResDataByYears } from '@domain/repositories/calendar.repository';
+import { Calendar } from '@domain/entities/calendar.entity';
 
 export interface CreateCalendarByYearRequest {
   year: number;
@@ -32,9 +32,7 @@ export interface CalendarUseCasesResponse {
 export class CalendarUseCases {
   private readonly calendarDomainService: ICalendarDomainService;
 
-  constructor(
-    private readonly calendarRepository: CalendarRepository
-  ) {
+  constructor(private readonly calendarRepository: CalendarRepository) {
     this.calendarDomainService = new CalendarDomainService();
   }
 
@@ -179,6 +177,17 @@ export class CalendarUseCases {
         message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving calendar'
       };
     }
+  }
+
+  getYearsAndMonths = async (): Promise<ResDataByYears> => {
+    const data = await this.calendarRepository.findYearsAndMonths();
+    if (!data || !data.years || !data.months) {
+      throw new Error('No calendar data found');
+    }
+    return {
+      years: data.years,
+      months: data.months
+    };
   }
 
   /**

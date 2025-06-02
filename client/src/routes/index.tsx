@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router";
 
 import Configuracion from "@/app/configuracion";
 import AsingSchedules from "@/app/asingschedules";
-import Programacion from "@/app/programacion";
+import Programacion from "@/app/calendario";
 import Employees from "@/app/employees";
 import Dashboard from "@/app/dashboard";
 import Shifts from "@/app/turnos";

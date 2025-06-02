@@ -1,8 +1,14 @@
 import { Calendar } from '@domain/entities/calendar.entity';
 
+export interface ResDataByYears {
+  years: number[];
+  months: { numero: number; nameMonth: string }[];
+}
+
 export interface CalendarRepository {
   save(calendar: Calendar): Promise<Calendar>;
   saveMany(calendars: Calendar[]): Promise<Calendar[]>;
+  findYearsAndMonths(): Promise<ResDataByYears>;
   findAll(): Promise<Calendar[] | []>;
   findByYear(year: number): Promise<Calendar[] | []>;
   findByYearAndMonth(year: number, month: number): Promise<Calendar[] | []>;

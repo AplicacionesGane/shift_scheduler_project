@@ -1,50 +1,29 @@
-import { Card } from "@/components/ui/card";
-import { useProgramacionCalendar } from "@/hooks/useProgramacionCalendar";
-import { SearchForm, CalendarGrid, MonthSummary, LoadingSpinner } from "./components";
-import { months } from "./components/SearchForm";
+import { useCalendar } from "@/hooks/useCalendar";
+import { SearchForm } from "./components";
 
 export default function Programacion() {
   const {
-    year,
-    month,
-    sucursal,
-    workSchedules,
-    calendarDays,
-    summary,
-    loading,
-    error,
-    handleSubmit,
-    handleYearChange,
-    handleMonthChange,
-    handleSucursalChange
-  } = useProgramacionCalendar();
+    handleSucursalChange,
+    handleYearOrMonthChange,
+    selectedMonth,
+    selectedYear,
+    sucursal
+  } = useCalendar();
 
-  const currentMonthName = months.find(m => m.value === month)?.label;
 
   return (
     <section className="p-4">
       <SearchForm
-        year={year}
-        month={month}
+        year={selectedYear}
+        month={selectedMonth}
         sucursal={sucursal}
-        loading={loading}
-        onYearChange={handleYearChange}
-        onMonthChange={handleMonthChange}
+        handleYearOrMonthChange={handleYearOrMonthChange}
         onSucursalChange={handleSucursalChange}
-        onSubmit={handleSubmit}
-      />
+      /> 
 
-      {error && (
-        <Card className="mt-4 p-4 border-red-200 bg-red-50">
-          <div className="text-red-700">{error}</div>
-        </Card>
-      )}
-
-      {/* Loading state */}
-      {loading && <LoadingSpinner />}
 
       {/* Calendario */}
-      {workSchedules.length > 0 && !loading && (
+      {/* {workSchedules.length > 0 && !loading && (
         <Card className="mt-4 p-4">
           <div className="mb-4">
             <h2 className="text-2xl font-bold text-center">
@@ -58,9 +37,9 @@ export default function Programacion() {
           <CalendarGrid calendarDays={calendarDays} />
           <MonthSummary summary={summary} />
         </Card>
-      )}
+      )} */}
 
-      {/* Mensaje cuando no hay datos */}
+      {/* Mensaje cuando no hay datos 
       {sucursal && workSchedules.length === 0 && !loading && !error && (
         <Card className="mt-4 p-8 text-center">
           <div className="text-gray-500">
@@ -70,6 +49,7 @@ export default function Programacion() {
           </div>
         </Card>
       )}
+        */}
     </section>
   );
 }
