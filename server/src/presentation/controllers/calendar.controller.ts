@@ -21,14 +21,6 @@ export class CalendarController {
         return;
       }
 
-      if (year < 1900 || year > 2100) {
-        res.status(400).json({ 
-          success: false,
-          message: 'Year must be between 1900 and 2100' 
-        });
-        return;
-      }
-
       const request: CreateCalendarByYearRequest = {
         year,
         forceRegenerate: forceRegenerate || false
@@ -97,7 +89,7 @@ export class CalendarController {
    * GET /api/calendar/year/:year/month/:month
    */
   public getCalendarByYearAndMonthCtrl = async (req: Request, res: Response): Promise<void> => {
-    try {
+    try {      
       const { year, month } = req.params;
 
       if (!year || isNaN(Number(year)) || !month || isNaN(Number(month))) {

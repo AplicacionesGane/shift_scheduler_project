@@ -25,7 +25,7 @@ const controllers = new CalendarController(usecases);
  */
 
 // Calendar management routes
-routerCalendar.post('/calendar', controllers.createCalendarByYearCtrl);
+routerCalendar.post('/calendar/year', controllers.createCalendarByYearCtrl);
 routerCalendar.get('/calendar/year/:year', controllers.getCalendarByYearCtrl);
 routerCalendar.get('/calendar/year/:year/month/:month', controllers.getCalendarByYearAndMonthCtrl);
 routerCalendar.get('/calendar/date/:year/:month/:day', controllers.getDateInfoCtrl);
