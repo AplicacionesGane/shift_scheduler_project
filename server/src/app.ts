@@ -2,6 +2,7 @@ import { routerWorkSchedule } from './presentation/routes/workschedule.routes';
 import { routerEmploye } from './presentation/routes/employee.routes';
 import { routerStores } from './presentation/routes/stores.routes';
 import { routerShift } from './presentation/routes/shift.routes';
+import { routerCalendar } from './presentation/routes/calendar.routes';
 
 import { SimpleLogger } from '@/presentation/middleware/simple-logger.middleware';
 import { sequelize } from '@/infrastructure/persistence/connection';
@@ -34,6 +35,7 @@ app.use('/api', routerEmploye);
 app.use('/api', routerStores);
 app.use('/api', routerShift);
 app.use('/api', routerWorkSchedule);
+app.use('/api', routerCalendar);
 
 // Test database connection
 sequelize.authenticate()

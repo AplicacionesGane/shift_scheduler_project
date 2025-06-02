@@ -8,6 +8,6 @@ export interface Calendar {
     nameDay: string;
     nameMonth: string;
     holidayDescription?: string | null; // Descripción del día festivo si aplica
-    createdAt?: Date | null;
-    updatedAt?: Date | null;
+    createdAt?: Date;
+    updatedAt?: Date;
 }

@@ -594,4 +594,59 @@ export class CalendarUseCases {
 
         return holidaysList.sort((a, b) => a.date.localeCompare(b.date));
     }
+
+    /**
+     * Obtiene información específica de una fecha
+     * @param year - Año de la fecha
+     * @param month - Mes de la fecha (1-12)
+     * @param day - Día de la fecha (1-31)
+     * @returns Promise con la información de la fecha
+     */
+    getDateInfo = async (year: number, month: number, day: number): Promise<CalendarUseCasesResponse> => {
+        try {
+            if (year < 1900 || year > 2100) {
+                return {
+                    success: false,
+                    message: 'Year must be between 1900 and 2100'
+                };
+            }
+
+            if (month < 1 || month > 12) {
+                return {
+                    success: false,
+                    message: 'Month must be between 1 and 12'
+                };
+            }
+
+            if (day < 1 || day > 31) {
+                return {
+                    success: false,
+                    message: 'Day must be between 1 and 31'
+                };
+            }
+
+            const calendar = await this.calendarRepository.findByDate(year, month, day);
+
+            if (!calendar) {
+                return {
+                    success: false,
+                    message: `No information found for date ${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}. The calendar for this year may not exist.`
+                };
+            }
+
+            return {
+                success: true,
+                message: `Date information retrieved successfully`,
+                data: [calendar],
+                count: 1
+            };
+
+        } catch (error) {
+            console.error('Error getting date info:', error);
+            return {
+                success: false,
+                message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving date information'
+            };
+        }
+    }
 }
