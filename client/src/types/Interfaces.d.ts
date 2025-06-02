@@ -55,3 +55,9 @@ export interface Store {
     horaSalidaFest: string;
     region: string;
 }
+
+export interface Vendedora {
+    documento: string;
+    nombres: string;
+    nameCargo: string;
+}

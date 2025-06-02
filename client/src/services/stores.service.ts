@@ -1,4 +1,4 @@
-import type { Shift, Store } from "@/types/Interfaces";
+import type { Shift, Store, Vendedora } from "@/types/Interfaces";
 import { API_SERVER_URL } from "@/utils/constants";
 import axios from "axios";
 
@@ -42,5 +42,18 @@ export const getAllShifts = async (): Promise<Shift[]> => {
   } catch (error) {
     console.error(error);
     throw new Error("Error al cargar los turnos");
+  }
+}
+
+export const getVendedoraByDocument = async (document: string): Promise<Vendedora> => {
+  try {
+    const response = await axios.get<Vendedora>(`${API_SERVER_URL}/employees/${document}`);
+    if (response.status !== 200) {
+      throw new Error(`Error fetching vendedora: ${response.statusText}`);
+    }
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al cargar la vendedora");
   }
 }

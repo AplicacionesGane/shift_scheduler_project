@@ -34,7 +34,7 @@ export class MysqlShiftRepository implements ShiftRepository {
   findShiftAll = async (): Promise<Shift[] | []> => {
     try {
       await ShiftModel.sync(); // Asegurarse de que la tabla esté sincronizada
-      const shifts = await ShiftModel.findAll();
+      const shifts = await ShiftModel.findAll({ order: [['nameTurno', 'ASC']] });
       if (!shifts || shifts.length === 0) return [];
       return shifts
     } catch (error) {
