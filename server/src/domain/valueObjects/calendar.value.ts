@@ -9,6 +9,7 @@ export interface CalendarValueDTO {
     isWeekend?: boolean;
     nameDay?: string;
     nameMonth?: string;
+    holidayDescription?: string | null;
 }
 
 export class CalendarValue implements Calendar {
@@ -20,6 +21,7 @@ export class CalendarValue implements Calendar {
     isWeekend: boolean;
     nameDay: string;
     nameMonth: string;
+    holidayDescription?: string | null;
     createdAt: Date;
     updatedAt: Date;
 
@@ -51,6 +53,7 @@ export class CalendarValue implements Calendar {
         this.isWeekend = calendarData.isWeekend || false;
         this.nameDay = calendarData.nameDay || this.getDayName(calendarData.year, calendarData.month, calendarData.days);
         this.nameMonth = calendarData.nameMonth || this.getMonthName(calendarData.month);
+        this.holidayDescription = calendarData.holidayDescription || null;
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }

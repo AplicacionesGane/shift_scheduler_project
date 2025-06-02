@@ -7,6 +7,7 @@ export interface Calendar {
     isWeekend: boolean;
     nameDay: string;
     nameMonth: string;
+    holidayDescription?: string | null; // Descripción del día festivo si aplica
     createdAt?: Date | null;
     updatedAt?: Date | null;
 }

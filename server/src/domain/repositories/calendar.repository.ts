@@ -9,4 +9,10 @@ export interface CalendarRepository {
   findByDate(year: number, month: number, day: number): Promise<Calendar | null>;
   deleteByYear(year: number): Promise<void>;
   existsByYear(year: number): Promise<boolean>;
+  
+  // Métodos para manejo manual de holidays
+  updateHolidayStatus(year: number, month: number, day: number, isHoliday: boolean, description?: string): Promise<Calendar | null>;
+  findHolidaysByYear(year: number): Promise<Calendar[] | []>;
+  addManualHoliday(year: number, month: number, day: number, description: string): Promise<Calendar | null>;
+  removeManualHoliday(year: number, month: number, day: number): Promise<Calendar | null>;
 }

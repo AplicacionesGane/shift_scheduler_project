@@ -7,6 +7,21 @@ export interface CreateCalendarByYearRequest {
     forceRegenerate?: boolean; // Si es true, borra y regenera el calendario existente
 }
 
+export interface ManualHolidayRequest {
+    year: number;
+    month: number;
+    day: number;
+    description: string;
+}
+
+export interface UpdateHolidayRequest {
+    year: number;
+    month: number;
+    day: number;
+    isHoliday: boolean;
+    description?: string;
+}
+
 export interface CalendarUseCasesResponse {
     success: boolean;
     message: string;
@@ -282,5 +297,301 @@ export class CalendarUseCases {
                 message: error instanceof Error ? error.message : 'Unknown error occurred while deleting calendar'
             };
         }
+    }
+
+    /**
+     * Agrega un día festivo manual al calendario
+     * @param request - Datos del día festivo a agregar
+     * @returns Promise con el resultado de la operación
+     */
+    addManualHoliday = async (request: ManualHolidayRequest): Promise<CalendarUseCasesResponse> => {
+        try {
+            const { year, month, day, description } = request;
+
+            if (year < 1900 || year > 2100) {
+                return {
+                    success: false,
+                    message: 'Year must be between 1900 and 2100'
+                };
+            }
+
+            if (month < 1 || month > 12) {
+                return {
+                    success: false,
+                    message: 'Month must be between 1 and 12'
+                };
+            }
+
+            if (day < 1 || day > 31) {
+                return {
+                    success: false,
+                    message: 'Day must be between 1 and 31'
+                };
+            }
+
+            if (!description || description.trim().length === 0) {
+                return {
+                    success: false,
+                    message: 'Holiday description is required'
+                };
+            }
+
+            // Verificar que existe el día en el calendario
+            const existingDay = await this.calendarRepository.findByDate(year, month, day);
+            if (!existingDay) {
+                return {
+                    success: false,
+                    message: `Calendar day ${day}/${month}/${year} not found. Create the calendar for year ${year} first.`
+                };
+            }
+
+            // Agregar el día festivo manual
+            const updatedDay = await this.calendarRepository.addManualHoliday(year, month, day, description.trim());
+
+            if (!updatedDay) {
+                return {
+                    success: false,
+                    message: 'Failed to add manual holiday'
+                };
+            }
+
+            return {
+                success: true,
+                message: `Manual holiday "${description}" added successfully for ${day}/${month}/${year}`,
+                data: [updatedDay],
+                count: 1
+            };
+
+        } catch (error) {
+            console.error('Error adding manual holiday:', error);
+            return {
+                success: false,
+                message: error instanceof Error ? error.message : 'Unknown error occurred while adding manual holiday'
+            };
+        }
+    }
+
+    /**
+     * Remueve un día festivo manual del calendario
+     * @param year - Año
+     * @param month - Mes (1-12)
+     * @param day - Día (1-31)
+     * @returns Promise con el resultado de la operación
+     */
+    removeManualHoliday = async (year: number, month: number, day: number): Promise<CalendarUseCasesResponse> => {
+        try {
+            if (year < 1900 || year > 2100) {
+                return {
+                    success: false,
+                    message: 'Year must be between 1900 and 2100'
+                };
+            }
+
+            if (month < 1 || month > 12) {
+                return {
+                    success: false,
+                    message: 'Month must be between 1 and 12'
+                };
+            }
+
+            if (day < 1 || day > 31) {
+                return {
+                    success: false,
+                    message: 'Day must be between 1 and 31'
+                };
+            }
+
+            // Verificar que el día existe y es un holiday
+            const existingDay = await this.calendarRepository.findByDate(year, month, day);
+            if (!existingDay) {
+                return {
+                    success: false,
+                    message: `Calendar day ${day}/${month}/${year} not found`
+                };
+            }
+
+            if (!existingDay.isHoliday) {
+                return {
+                    success: false,
+                    message: `Day ${day}/${month}/${year} is not currently marked as a holiday`
+                };
+            }
+
+            // Verificar si es un día festivo fijo (no se puede remover)
+            const fixedHolidayInfo = this.calendarDomainService.isFixedHoliday(month, day);
+            if (fixedHolidayInfo.isHoliday) {
+                return {
+                    success: false,
+                    message: `Cannot remove fixed holiday "${fixedHolidayInfo.description}" on ${day}/${month}. Fixed holidays cannot be modified.`
+                };
+            }
+
+            // Remover el día festivo manual
+            const updatedDay = await this.calendarRepository.removeManualHoliday(year, month, day);
+
+            if (!updatedDay) {
+                return {
+                    success: false,
+                    message: 'Failed to remove manual holiday'
+                };
+            }
+
+            return {
+                success: true,
+                message: `Manual holiday removed successfully for ${day}/${month}/${year}`,
+                data: [updatedDay],
+                count: 1
+            };
+
+        } catch (error) {
+            console.error('Error removing manual holiday:', error);
+            return {
+                success: false,
+                message: error instanceof Error ? error.message : 'Unknown error occurred while removing manual holiday'
+            };
+        }
+    }
+
+    /**
+     * Actualiza el estado de holiday de un día específico
+     * @param request - Datos de actualización del holiday
+     * @returns Promise con el resultado de la operación
+     */
+    updateHolidayStatus = async (request: UpdateHolidayRequest): Promise<CalendarUseCasesResponse> => {
+        try {
+            const { year, month, day, isHoliday, description } = request;
+
+            if (year < 1900 || year > 2100) {
+                return {
+                    success: false,
+                    message: 'Year must be between 1900 and 2100'
+                };
+            }
+
+            if (month < 1 || month > 12) {
+                return {
+                    success: false,
+                    message: 'Month must be between 1 and 12'
+                };
+            }
+
+            if (day < 1 || day > 31) {
+                return {
+                    success: false,
+                    message: 'Day must be between 1 and 31'
+                };
+            }
+
+            // Verificar que el día existe
+            const existingDay = await this.calendarRepository.findByDate(year, month, day);
+            if (!existingDay) {
+                return {
+                    success: false,
+                    message: `Calendar day ${day}/${month}/${year} not found`
+                };
+            }
+
+            // Verificar si es un día festivo fijo y se está intentando desactivar
+            const fixedHolidayInfo = this.calendarDomainService.isFixedHoliday(month, day);
+            if (fixedHolidayInfo.isHoliday && !isHoliday) {
+                return {
+                    success: false,
+                    message: `Cannot disable fixed holiday "${fixedHolidayInfo.description}" on ${day}/${month}. Fixed holidays cannot be modified.`
+                };
+            }
+
+            // Si se está activando como holiday, verificar que tenga descripción
+            if (isHoliday && (!description || description.trim().length === 0)) {
+                // Si es un día festivo fijo, usar su descripción
+                if (fixedHolidayInfo.isHoliday) {
+                    // Ya tiene descripción por defecto, no hacer nada
+                } else {
+                    return {
+                        success: false,
+                        message: 'Holiday description is required when marking a day as holiday'
+                    };
+                }
+            }
+
+            // Actualizar el estado del holiday
+            const updatedDay = await this.calendarRepository.updateHolidayStatus(
+                year, 
+                month, 
+                day, 
+                isHoliday, 
+                description?.trim()
+            );
+
+            if (!updatedDay) {
+                return {
+                    success: false,
+                    message: 'Failed to update holiday status'
+                };
+            }
+
+            return {
+                success: true,
+                message: `Holiday status updated successfully for ${day}/${month}/${year}`,
+                data: [updatedDay],
+                count: 1
+            };
+
+        } catch (error) {
+            console.error('Error updating holiday status:', error);
+            return {
+                success: false,
+                message: error instanceof Error ? error.message : 'Unknown error occurred while updating holiday status'
+            };
+        }
+    }
+
+    /**
+     * Obtiene todos los días festivos de un año específico
+     * @param year - Año del cual obtener los holidays
+     * @returns Promise con los días festivos del año
+     */
+    getHolidaysByYear = async (year: number): Promise<CalendarUseCasesResponse> => {
+        try {
+            if (year < 1900 || year > 2100) {
+                return {
+                    success: false,
+                    message: 'Year must be between 1900 and 2100'
+                };
+            }
+
+            const holidays = await this.calendarRepository.findHolidaysByYear(year);
+
+            return {
+                success: true,
+                message: `Retrieved ${holidays.length} holidays for year ${year}`,
+                data: holidays,
+                count: holidays.length
+            };
+
+        } catch (error) {
+            console.error('Error getting holidays by year:', error);
+            return {
+                success: false,
+                message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving holidays'
+            };
+        }
+    }
+
+    /**
+     * Obtiene la lista de días festivos fijos de Colombia
+     * @returns Lista de días festivos fijos
+     */
+    getFixedHolidays = (): { date: string; description: string }[] => {
+        const fixedHolidays = this.calendarDomainService.getFixedHolidays();
+        const holidaysList: { date: string; description: string }[] = [];
+
+        fixedHolidays.forEach((description, dateKey) => {
+            holidaysList.push({
+                date: dateKey,
+                description
+            });
+        });
+
+        return holidaysList.sort((a, b) => a.date.localeCompare(b.date));
     }
 }
