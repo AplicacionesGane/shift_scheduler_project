@@ -1,10 +1,10 @@
-import { memo } from 'react';
+import type { Vendedora } from "@/types/Interfaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { Card } from "@/components/ui/card";
 import { Users } from "lucide-react";
-import type { Vendedora } from "@/types/Interfaces";
+import { memo } from 'react';
 
 interface VendedoraSearchStepProps {
   vendedora?: Vendedora;

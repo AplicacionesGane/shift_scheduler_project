@@ -34,7 +34,9 @@ export async function assignScheduleService(info: AssignmentData): Promise<Assig
     const results: AssignmentResult[] = [];
 
     for (const date of dates) {
-        const dateString = `${date.day}/${date.month}/${date.year}`;
+        const month = date.month + 1;
+
+        const dateString = `${date.day}/${month}/${date.year}`;
         
         try {
             const response = await axios.post(`${API_SERVER_URL}/work-schedules`, {
@@ -43,7 +45,7 @@ export async function assignScheduleService(info: AssignmentData): Promise<Assig
                 employee: employeeDocument,
                 status: 'assigned',
                 day: date.day,
-                month: date.month,
+                month,
                 year: date.year
             });
             

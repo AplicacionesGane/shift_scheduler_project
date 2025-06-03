@@ -1,10 +1,10 @@
-import { memo, useMemo } from 'react';
-import { Button } from "@/components/ui/button";
-import { Label } from "@radix-ui/react-label";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import type { Store, Vendedora, Shift } from "@/types/Interfaces";
+import { Button } from "@/components/ui/button";
+import { Label } from "@radix-ui/react-label";
+import { Card } from "@/components/ui/card";
+import { memo, useMemo } from 'react';
 
 interface DateAssignmentStepProps {
   store?: Store;

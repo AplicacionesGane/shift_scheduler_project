@@ -1,9 +1,9 @@
-import { memo } from 'react';
+import type { Store } from "@/types/Interfaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { Card } from "@/components/ui/card";
-import type { Store } from "@/types/Interfaces";
+import { memo } from 'react';
 
 interface StoreSearchStepProps {
   id: string;

@@ -1,7 +1,7 @@
-import { memo, useMemo } from 'react';
-import { Card } from "@/components/ui/card";
-import { Clock } from "lucide-react";
 import type { Shift } from "@/types/Interfaces";
+import { Card } from "@/components/ui/card";
+import { memo, useMemo } from 'react';
+import { Clock } from "lucide-react";
 
 interface ShiftSelectionStepProps {
   shifts: Shift[];
