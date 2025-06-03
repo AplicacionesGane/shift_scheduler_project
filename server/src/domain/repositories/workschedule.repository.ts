@@ -1,9 +1,9 @@
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 
 export interface WorkScheduleRepository {
-  create(workSchedule: WorkSchedule): Promise<WorkSchedule>;
-  findById(id: string): Promise<WorkSchedule | null>;
-  findAll(): Promise<WorkSchedule[] | null>;
-  update(id: string, workSchedule: Partial<WorkSchedule>): Promise<WorkSchedule | null>;
-  delete(id: string): Promise<boolean>;
+  save(workSchedule: WorkSchedule): Promise<WorkSchedule>;
+  findAll(): Promise<WorkSchedule[] | []>;
+  findByDocumentAndDate(document: string, year: number, month: number, day: number): Promise<boolean | null>;
+  findWorkScheduleByshiftId(idShift: string): Promise<boolean>;
+  findByStoreYearMonth(idStore: string, year: number, month: number): Promise<WorkSchedule[] | []>;
 }

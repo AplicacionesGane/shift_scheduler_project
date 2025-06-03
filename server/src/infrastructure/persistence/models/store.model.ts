@@ -1,5 +1,5 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { sequelize } from '@infrastructure/persistence/database';
+import { sequelize } from '@/infrastructure/persistence/connection';
 
 class StoreModel extends Model<InferAttributes<StoreModel>, InferCreationAttributes<StoreModel>> {
   declare ZONA: string;

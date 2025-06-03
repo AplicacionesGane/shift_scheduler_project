@@ -1,18 +1,21 @@
-import { EmployeeRepository } from '@domain/repositories/employee.repository';
-import { EmployeeEntity } from '@domain/entities/employe.entity';
+import { EmployeeRepository } from "@/domain/repositories/employee.repository";
 
 export class EmployeeUseCases {
-    constructor(private readonly employeeRepo: EmployeeRepository) {}
+  constructor(private readonly employeeRepo: EmployeeRepository) { }
 
-    async findByDocument(document: string): Promise<EmployeeEntity | null> {
-        return this.employeeRepo.findById(document);
-    }
+  employeeById = async (document: string) => {
+    const employee = await this.employeeRepo.findEmployeeById(document);
+    return employee;
+  }
 
-    async findAll(): Promise<EmployeeEntity[] | null> {
-        return this.employeeRepo.findAll();
-    }
+  allEmployees = async () => {
+    const employees = await this.employeeRepo.findAllEmployees();
+    return employees;
+  }
 
-    async findAllByCargo(cargo: string): Promise<EmployeeEntity[] | null> {
-        return this.employeeRepo.findByCargo(cargo);
-    }
+  employeesByCargo = async (cargo: string) => {
+    const employees = await this.employeeRepo.findAllEmployeesByCargo(cargo);
+    return employees;
+  }
+
 }

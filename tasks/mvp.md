@@ -154,7 +154,7 @@ graph LR
 | ¿Complejidad del sistema actual? | `___` | 🔄 Migración |
 
 ### 🎯 **Criterios de Aceptación MVP:**
-- [ ] Un administrador puede crear/editar empleados
+- [✅] Un administrador puede crear/editar empleados
 - [ ] Un supervisor puede configurar turnos básicos
 - [ ] Un supervisor puede asignar turnos manualmente
 - [ ] Los empleados pueden consultar sus horarios

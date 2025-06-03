@@ -1,7 +1,7 @@
-import { MysqlWorkScheduleRepository } from '@infrastructure/persistence/repositories/MysqlWorkScheduleRepository';
-import { MysqlEmployeeRepository } from '@infrastructure/persistence/repositories/MysqlEmployeeRepository';
-import { MysqlShiftRepository } from '@infrastructure/persistence/repositories/MysqlShiftRepository';
-import { MysqlStoreRepository } from '@infrastructure/persistence/repositories/MysqlStoreRepository';
+import { MysqlWorkScheduleRepository } from '@/infrastructure/repositories/mysql/MysqlWorkScheduleRepository';
+import { MysqlEmployeeRepository } from '@/infrastructure/repositories/mysql/MysqlEmployeeRepository';
+import { MysqlShiftRepository } from '@/infrastructure/repositories/mysql/MysqlShiftRepository';
+import { MysqlStoreRepository } from '@/infrastructure/repositories/mysql/MysqlStoreRepository';
 import { WorkScheduleController } from '@presentation/controllers/workschedule.controller';
 import { WorkScheduleUseCases } from '@application/workschedule/workschedule.usecases';
 import { Router } from 'express';
@@ -17,8 +17,9 @@ const shiftRepository = new MysqlShiftRepository();
 const storeRepository = new MysqlStoreRepository();
 
 /**
- * Iniciamos casos de uso
+ * Iniciar los usecases
  */
+
 const usecases = new WorkScheduleUseCases(
     workScheduleRepository,
     employeeRepository,
@@ -26,43 +27,12 @@ const usecases = new WorkScheduleUseCases(
     storeRepository
 );
 
-/**
- * Iniciamos los controladores
- */
+// Iniciar los controllers
 const controllers = new WorkScheduleController(usecases);
 
-/**
- * Definir rutas para Work Schedules
- */
-
-// Crear nueva asignación de turno
-routerWorkSchedule.post('/work-schedules', controllers.createWorkSchedule);
-
-// Obtener todas las asignaciones
-routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedules);
-
-// Obtener asignación por ID
-routerWorkSchedule.get('/work-schedules/:id', controllers.getWorkScheduleById);
-
-// Obtener asignaciones por empleado
-routerWorkSchedule.get('/work-schedules/employee/:employeeDocument', controllers.getWorkSchedulesByEmployee);
-
-// Obtener asignaciones por tienda
-routerWorkSchedule.get('/work-schedules/store/:storeId', controllers.getWorkSchedulesByStore);
-
-// Obtener asignaciones por fecha
-routerWorkSchedule.get('/work-schedules/date/:date', controllers.getWorkSchedulesByDate);
-
-// Obtener horario semanal de un empleado
-routerWorkSchedule.get('/work-schedules/weekly/:employeeDocument/:startDate', controllers.getWeeklySchedule);
-
-// Actualizar estado de una asignación
-routerWorkSchedule.patch('/work-schedules/:id/status', controllers.updateWorkScheduleStatus);
-
-// Cambiar turno de una asignación
-routerWorkSchedule.patch('/work-schedules/:id/shift', controllers.changeWorkScheduleShift);
-
-// Eliminar asignación
-routerWorkSchedule.delete('/work-schedules/:id', controllers.deleteWorkSchedule);
+routerWorkSchedule.post('/work-schedules', controllers.createWorkScheduleCtrl);
+routerWorkSchedule.get('/work-schedules', controllers.getAllWorkSchedulesCtrl);
+routerWorkSchedule.get('/work-schedules/:storeId/:year/:month', controllers.findByStoreIdWhitMonthAndYearCtrl);
+routerWorkSchedule.get('/work-schedules/:document/:date', controllers.getWorkScheduleByDocumentAndDateCtrl);
 
 export { routerWorkSchedule };

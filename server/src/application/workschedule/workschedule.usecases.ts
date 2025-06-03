@@ -1,232 +1,86 @@
+import { WorkScheduleValue, WorkScheduleValueDTO } from '@domain/valueObjects/workschedule.value';
 import { WorkScheduleRepository } from '@domain/repositories/workschedule.repository';
 import { EmployeeRepository } from '@domain/repositories/employee.repository';
 import { ShiftRepository } from '@domain/repositories/shift.repository';
 import { StoreRepository } from '@domain/repositories/store.repository';
-import { WorkScheduleValue } from '@domain/valueObjects/workschedule.value';
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 
-export interface createWorkScheduleDTO {
-    employeeDocument: string; // FK a Employee
-    shiftId: string;          // FK a Shift
-    storeId: string;         // FK a Store
-    assignedDate: string;    // YYYY-MM-DD
-    status: 'assigned' | 'completed' | 'absent';
-}
-
 export class WorkScheduleUseCases {
-    constructor(
-        private readonly workScheduleRepo: WorkScheduleRepository,
-        private readonly employeeRepo: EmployeeRepository,
-        private readonly shiftRepo: ShiftRepository,
-        private readonly storeRepo: StoreRepository
-    ) {}
+  constructor(
+    private readonly workScheduleRepo: WorkScheduleRepository,
+    private readonly employeeRepo: EmployeeRepository,
+    private readonly shiftRepo: ShiftRepository,
+    private readonly storeRepo: StoreRepository
+  ) { }
 
-    /**
-     * Crear una nueva asignación de turno
-     */
-    async assignShift(workScheduleData: createWorkScheduleDTO): Promise<WorkSchedule> {
-        // Validar que el empleado existe
-        const employee = await this.employeeRepo.findById(workScheduleData.employeeDocument);
+  createNewSchedule = async (newSchedule: WorkScheduleValueDTO): Promise<WorkSchedule> => {
 
-        if (!employee) throw new Error(`Employee with document ${workScheduleData.employeeDocument} not found or not exist`);
+    // 1. valida que el empleado exista
+    const employee = await this.employeeRepo.findEmployeeById(newSchedule.employee);
+    if (!employee) throw new Error(`Employee with document ${newSchedule.employee} not found or not exist`);
 
-        const shift = await this.shiftRepo.findById(workScheduleData.shiftId);
-        if (!shift) throw new Error(`Shift with id ${workScheduleData.shiftId} not found`);
+    // 2. valida que no exista una asignación previa para el empleado en la fecha especificada
+    const existingAssignment = await this.workScheduleRepo.findByDocumentAndDate(
+      newSchedule.employee, newSchedule.year, newSchedule.month, newSchedule.day
+    );
+    if (existingAssignment) throw new Error(`Employee ${newSchedule.employee} already has an assignment on ${newSchedule.year}-${newSchedule.month}-${newSchedule.day}`)
 
-        // validar que la tienda existe
-        const store = await this.storeRepo.findById(workScheduleData.storeId);
-        if (!store) throw new Error(`Store with id ${workScheduleData.storeId} not found`);
+    // 3. valida que el turno exista
+    const shift = await this.shiftRepo.findShiftById(newSchedule.shiftId);
+    if (!shift) throw new Error(`Shift with id ${newSchedule.shiftId} not found`);
 
-        // Validar que no exista ya una asignación para ese empleado en esa fecha
-        const existingAssignment = await this.findByEmployeeAndDate(
-            workScheduleData.employeeDocument, 
-            workScheduleData.assignedDate
-        );
+    // 4. valida que la tienda exista - PDV
+    const store = await this.storeRepo.findStoreById(newSchedule.storeId);
+    if (!store) throw new Error(`Store with id ${newSchedule.storeId} not found`);
 
-        if (existingAssignment) {
-            throw new Error(`Employee ${workScheduleData.employeeDocument} already has an assignment on ${workScheduleData.assignedDate}`);
-        }
+    // 5. Intancia el objeto WorkScheduleValue con los datos validados
+    const workSchedule = new WorkScheduleValue(newSchedule);
 
-        return this.workScheduleRepo.create(new WorkScheduleValue(workScheduleData));
+    // 6. Este se guardará en la base de datos cuando sea implementado el repositorio
+    const createdWorkSchedule = await this.workScheduleRepo.save(workSchedule);
+
+    if (!createdWorkSchedule) throw new Error('Error creating work schedule');
+
+    // 7. Retorna el objeto creado como lo espera el repositorio
+    return createdWorkSchedule;
+  }
+
+  findWorkScheduleByDocumentAndDate = async (document: string, year: number, month: number, day: number) => {
+    const schedule = await this.workScheduleRepo.findByDocumentAndDate(document, year, month, day);
+    if (!schedule) throw new Error(`No work schedule found for employee with document ${document} on date ${new Date(year, month - 1, day).toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })}`);
+    return schedule;
+  }
+
+  findByStoreYearMonth = async (storeId: string, year: number, month: number): Promise<WorkSchedule[] | null> => {
+    try {
+      const workSchedules = await this.workScheduleRepo.findByStoreYearMonth(storeId, year, month);
+      if (!workSchedules || workSchedules.length === 0) {
+        return []
+      }
+      return workSchedules;
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        throw new Error(`Error retrieving work schedules for store with id ${storeId}: ${error.message}`);
+      }
+      return [];
     }
+  }
 
-    /**
-     * Obtener todas las asignaciones
-     */
-    async findAll(): Promise<WorkSchedule[] | null> {
-        return this.workScheduleRepo.findAll();
-    }
+  findWorkScheduleByShiftId = async (shiftId: string): Promise<boolean> => {
+    const workSchedule = await this.workScheduleRepo.findWorkScheduleByshiftId(shiftId);
+    if (!workSchedule) throw new Error(`No work schedule found for shift with id ${shiftId}`);
+    return workSchedule;
+  }
 
-    /**
-     * Obtener asignación por ID
-     */
-    async findById(id: string): Promise<WorkSchedule | null> {
-        return this.workScheduleRepo.findById(id);
-    }
+  findAllWorkSchedules = async (): Promise<WorkSchedule[] | null> => {
+    const workSchedules = await this.workScheduleRepo.findAll();
+    if (!workSchedules || workSchedules.length === 0) throw new Error('No work schedules found');
+    return workSchedules;
+  }
 
-    /**
-     * Obtener horario de un empleado por documento
-     */
-    async findByEmployeeDocument(employeeDocument: string): Promise<WorkSchedule[] | null> {
-        // Si el repositorio tiene método específico, usarlo
-        if ('findByEmployeeDocument' in this.workScheduleRepo) {
-            return (this.workScheduleRepo as any).findByEmployeeDocument(employeeDocument);
-        }
-
-        // Fallback al método genérico
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
-
-        const employeeSchedules = allSchedules.filter(
-            schedule => schedule.employeeDocument === employeeDocument
-        );
-
-        return employeeSchedules.length > 0 ? employeeSchedules : null;
-    }
-
-    /**
-     * Obtener asignación específica de un empleado en una fecha
-     * TODO: Revisar si el repositorio tiene un método específico para esto
-     */
-    async findByEmployeeAndDate(employeeDocument: string, date: string): Promise<WorkSchedule | null> {
-        // Si el repositorio tiene método específico, usarlo
-        if ('findByEmployeeAndDate' in this.workScheduleRepo) {
-            return (this.workScheduleRepo as any).findByEmployeeAndDate(employeeDocument, date);
-        }
-
-        // Fallback al método genérico
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
-
-        return allSchedules.find(
-            schedule => schedule.employeeDocument === employeeDocument && schedule.assignedDate === date
-        ) || null;
-    }
-
-    /**
-     * Obtener todas las asignaciones por tienda
-     */
-    async findByStore(storeId: string): Promise<WorkSchedule[] | null> {
-        // Si el repositorio tiene método específico, usarlo
-        if ('findByStoreId' in this.workScheduleRepo) {
-            return (this.workScheduleRepo as any).findByStoreId(storeId);
-        }
-
-        // Fallback al método genérico
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
-
-        const storeSchedules = allSchedules.filter(
-            schedule => schedule.storeId === storeId
-        );
-
-        return storeSchedules.length > 0 ? storeSchedules : null;
-    }
-
-    /**
-     * Obtener todas las asignaciones de una fecha específica
-     */
-    async findByDate(date: string): Promise<WorkSchedule[] | null> {
-        // Si el repositorio tiene método específico, usarlo
-        if ('findByDate' in this.workScheduleRepo) {
-            return (this.workScheduleRepo as any).findByDate(date);
-        }
-
-        // Fallback al método genérico
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
-
-        const dateSchedules = allSchedules.filter(
-            schedule => schedule.assignedDate === date
-        );
-
-        return dateSchedules.length > 0 ? dateSchedules : null;
-    }
-
-    /**
-     * Obtener horario semanal de un empleado
-     */
-    async getWeeklySchedule(employeeDocument: string, weekStartDate: string): Promise<WorkSchedule[] | null> {
-        // Calcular las 7 fechas de la semana
-        const weekDates = this.getWeekDates(weekStartDate);
-        
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
-
-        const weeklySchedules = allSchedules.filter(
-            schedule => 
-                schedule.employeeDocument === employeeDocument && 
-                weekDates.includes(schedule.assignedDate)
-        );
-
-        return weeklySchedules.length > 0 ? weeklySchedules : null;
-    }
-
-    /**
-     * Cambiar el estado de una asignación
-     */
-    async updateStatus(id: string, status: 'assigned' | 'completed' | 'absent'): Promise<WorkSchedule | null> {
-        return this.workScheduleRepo.update(id, { status, updatedAt: new Date() });
-    }
-
-    /**
-     * Cambiar turno de una asignación existente
-     */
-    async changeShift(id: string, newShiftId: string): Promise<WorkSchedule | null> {
-        // Validar que el nuevo turno existe
-        const shift = await this.shiftRepo.findById(newShiftId);
-        if (!shift) {
-            throw new Error(`Shift with id ${newShiftId} not found`);
-        }
-
-        return this.workScheduleRepo.update(id, { 
-            shiftId: newShiftId, 
-            updatedAt: new Date() 
-        });
-    }
-
-    /**
-     * Eliminar una asignación
-     */
-    async removeAssignment(id: string): Promise<boolean> {
-        return this.workScheduleRepo.delete(id);
-    }
-
-    /**
-     * Obtener resumen de asignaciones por tienda en una fecha
-     */
-    async getStoreScheduleSummary(storeId: string, date: string): Promise<WorkSchedule[] | null> {
-        const allSchedules = await this.workScheduleRepo.findAll();
-        if (!allSchedules) return null;
-
-        const storeSchedules = allSchedules.filter(
-            schedule => schedule.storeId === storeId && schedule.assignedDate === date
-        );
-
-        return storeSchedules.length > 0 ? storeSchedules : null;
-    }
-
-    /**
-     * Utility: Generar las fechas de una semana completa
-     */
-    private getWeekDates(startDate: string): string[] {
-        const dates: string[] = [];
-        const start = new Date(startDate);
-        
-        for (let i = 0; i < 7; i++) {
-            const currentDate = new Date(start);
-            currentDate.setDate(start.getDate() + i);
-            dates.push(currentDate.toISOString().split('T')[0]); // YYYY-MM-DD format
-        }
-        
-        return dates;
-    }
-
-    /**
-     * Validar formato de fecha
-     */
-    private isValidDateFormat(date: string): boolean {
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        return dateRegex.test(date) && !isNaN(Date.parse(date));
-    }
 }

@@ -1,4 +1,4 @@
-import { MysqlStoreRepository } from '@infrastructure/persistence/repositories/MysqlStoreRepository';
+import { MysqlStoreRepository } from '@/infrastructure/repositories/mysql/MysqlStoreRepository';
 import { StoreController } from '@presentation/controllers/store.controller';
 import { StoreUseCases } from '@application/store/store.usecases';
 import { Router } from 'express';
@@ -27,7 +27,8 @@ const controllers = new StoreController(usecases);
  * Definir rutas
  */
 
-routerStores.get('/stores', controllers.getAllStores);
-routerStores.get('/stores/:id', controllers.getStoreById);
+routerStores.get('/stores', controllers.getAllStoresCtrl);
+routerStores.get('/stores/:id', controllers.getStoreByIdCtrl);
+routerStores.get('/stores/company/:company', controllers.getStoresByCompanyCtrl);
 
 export { routerStores }

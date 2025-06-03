@@ -1,13 +1,14 @@
 import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
-import { WorkSchedule } from '@domain/entities/workschedule.entity';
-import { sequelize } from '@infrastructure/persistence/database';
+import { sequelize } from '@/infrastructure/persistence/connection';
 
-class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferCreationAttributes<WorkScheduleModel>> implements WorkSchedule {
+class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferCreationAttributes<WorkScheduleModel>> {
     declare id?: string;
-    declare employeeDocument: string;
+    declare employee: string;
     declare shiftId: string;
     declare storeId: string;
-    declare assignedDate: string;
+    declare year: number;
+    declare month: number;
+    declare day: number;
     declare status: 'assigned' | 'completed' | 'absent';
     declare createdAt?: Date;
     declare updatedAt?: Date;
@@ -15,10 +16,12 @@ class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferC
 
 WorkScheduleModel.init({
     id: { type: DataTypes.STRING(36), primaryKey: true, allowNull: false },
-    employeeDocument: { type: DataTypes.STRING(20), allowNull: false },
+    employee: { type: DataTypes.STRING(20), allowNull: false },
     shiftId: { type: DataTypes.STRING(36), allowNull: false },
     storeId: { type: DataTypes.STRING(10), allowNull: false },
-    assignedDate: { type: DataTypes.DATEONLY, allowNull: false },
+    year: { type: DataTypes.INTEGER, allowNull: false },
+    month: { type: DataTypes.INTEGER, allowNull: false },
+    day: { type: DataTypes.INTEGER, allowNull: false },
     status: { type: DataTypes.ENUM('assigned', 'completed', 'absent'), allowNull: false, defaultValue: 'assigned' }
 },
     {
