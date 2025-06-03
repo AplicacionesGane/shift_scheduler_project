@@ -7,6 +7,7 @@ Para el primer entregable, nos enfocamos en el **módulo más crítico y fundame
 
 > ### 📅 **Módulo de Programación Básica**
 > - ✅ **Gestión básica de empleados** (CRUD simple)
+> - ✅ **Creación Automatizada Calendario x Año** - solo festivos fijos - sistema CRUD para agregar los démas.
 > - ✅ **Configuración de turnos simples** por punto de venta
 > - ✅ **Asignación manual de turnos** (sin automatización inicial)
 > - ✅ **Visualización de horarios** semanales/mensuales
@@ -22,10 +23,13 @@ Para el primer entregable, nos enfocamos en el **módulo más crítico y fundame
 📁 Domain (Entidades de Negocio)
 ├── 🏢 Entities/
 │   ├── Employee
+│   ├── Calendar
 │   ├── Shift
 │   ├── WorkSchedule
 │   └── Store
 ├── 💎 ValueObjects/
+│   ├── Shift
+│   ├── Calendar
 │   ├── TimeSlot
 │   ├── WorkDay
 │   └── EmployeeId
@@ -59,6 +63,7 @@ Para el primer entregable, nos enfocamos en el **módulo más crítico y fundame
 |-------|--------|------------|
 | Entidades básicas (Employee, Shift, Schedule) | ⏳ Pendiente | 5 días |
 | CRUD de empleados | ⏳ Pendiente | 3 días |
+| Calendario anual básico | ⏳ Pendiente | 4 días |
 | Configuración simple de turnos | ⏳ Pendiente | 4 días |
 | Asignación manual de turnos | ⏳ Pendiente | 5 días |
 | API REST básica | ⏳ Pendiente | 3 días |
@@ -95,6 +100,7 @@ Para el primer entregable, nos enfocamos en el **módulo más crítico y fundame
 | **Employee** | Empleado/Cajero | 🔴 Alta |
 | **Shift** | Definición de turno | 🔴 Alta |
 | **WorkSchedule** | Programación de horarios | 🔴 Alta |
+| **Calendar** | Calendario Anual | 🟡 Media |
 | **Store** | Punto de Venta | 🟡 Media |
 
 ### 💎 **Value Objects:**
@@ -103,8 +109,6 @@ Para el primer entregable, nos enfocamos en el **módulo más crítico y fundame
 | **TimeSlot** | Franja Horaria | 🔴 Alta |
 | **WorkDay** | Día Laboral | 🟡 Media |
 | **EmployeeId** | Identificador único | 🔴 Alta |
-
----
 
 ## 🚀 **Plan de Desarrollo - Orden Sugerido**
 
