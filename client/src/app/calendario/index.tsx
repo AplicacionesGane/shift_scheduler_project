@@ -38,6 +38,16 @@ interface WorkSchedule {
   createdAt: string
 }
 
+interface Shift {
+  id: string
+  nameTurno: string
+  description: string
+  startTime: string
+  endTime: string
+  createdAt: string
+  updatedAt: string
+}
+
 const generateCalendarGrid = (data: DayCalendar[]) => {
   if (!data.length) return [];
 
@@ -75,6 +85,7 @@ export default function CalendarProgramer() {
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>("")
   const [sucursal, setSucursal] = useState<string>("")
+  const [shift, setShift] = useState<Shift[]>([])
 
   const [daysCalendar, setDayCalendar] = useState<DayCalendar[]>([])
   const [workSchedules, setWorkSchedules] = useState<WorkSchedule[]>([])
@@ -89,6 +100,10 @@ export default function CalendarProgramer() {
   useEffect(() => {
     axios.get(`${API_SERVER_URL}/calendar/years-months`)
       .then(res => setDataDates(res.data))
+      .catch(err => console.log(err))
+    
+    axios.get(`${API_SERVER_URL}/shifts`)
+      .then(res => setShift(res.data))
       .catch(err => console.log(err))
   }, [])
 
@@ -169,6 +184,12 @@ export default function CalendarProgramer() {
       schedule.month === month && 
       schedule.day === day
     );
+  }
+
+  // Función para obtener el nombre del turno por shiftId
+  const getShiftName = (shiftId: string) => {
+    const foundShift = shift.find(s => s.id === shiftId);
+    return foundShift ? foundShift.nameTurno : 'Sin turno';
   }
 
   const renderDay = generateCalendarGrid(daysCalendar)
@@ -281,7 +302,7 @@ export default function CalendarProgramer() {
                 `}
               >
                 {c?.days && (
-                  <div className="h-full flex flex-col">
+                  <div className="h-full flex flex-col relative">
                     <div className={`font-bold text-xl mb-2 ${c.isHoliday ? 'text-red-800' : c.isWeekend ? 'text-blue-800' : 'text-slate-800'}`}>
                       {c.days}
                     </div>
@@ -294,13 +315,14 @@ export default function CalendarProgramer() {
 
                     {/* Mostrar empleados programados */}
                     {dayWorkSchedules.length > 0 && (
-                      <div className="flex-1 space-y-1">
+                      <div className="absolute flex-1 space-y-1 right-0">
                         {dayWorkSchedules.slice(0, 2).map((schedule) => (
                           <div 
                             key={schedule.id} 
                             className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-md font-medium border border-green-300"
                           >
-                            {schedule.employee}
+                            <div className="font-semibold">{schedule.employee}</div>
+                            <div className="text-green-600 text-[10px]">{getShiftName(schedule.shiftId)}</div>
                           </div>
                         ))}
                         {dayWorkSchedules.length > 2 && (
