@@ -15,7 +15,7 @@ export const ScheduledEmployees = memo(({
   if (schedules.length === 0) return null;
 
   return (
-    <div className="absolute flex-1 space-y-1 right-0">
+    <div className="absolute flex-1 space-y-1 right-0 left-8">
       {schedules.slice(0, maxVisible).map((schedule) => (
         <div 
           key={schedule.id} 

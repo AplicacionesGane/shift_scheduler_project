@@ -37,60 +37,155 @@ export class CalendarUseCases {
   }
 
   /**
+   * Valida que el año esté en el rango permitido
+   */
+  private validateYear(year: number): { isValid: boolean; message?: string } {
+    if (year < 1900 || year > 2100) {
+      return {
+        isValid: false,
+        message: 'Year must be between 1900 and 2100'
+      };
+    }
+    return { isValid: true };
+  }
+
+  /**
+   * Valida que el mes esté en el rango permitido
+   */
+  private validateMonth(month: number): { isValid: boolean; message?: string } {
+    if (month < 1 || month > 12) {
+      return {
+        isValid: false,
+        message: 'Month must be between 1 and 12'
+      };
+    }
+    return { isValid: true };
+  }
+
+  /**
+   * Valida que el día esté en el rango permitido
+   */
+  private validateDay(day: number): { isValid: boolean; message?: string } {
+    if (day < 1 || day > 31) {
+      return {
+        isValid: false,
+        message: 'Day must be between 1 and 31'
+      };
+    }
+    return { isValid: true };
+  }
+
+  /**
+   * Valida año, mes y día en conjunto
+   */
+  private validateDate(year: number, month: number, day: number): { isValid: boolean; message?: string } {
+    const yearValidation = this.validateYear(year);
+    if (!yearValidation.isValid) return yearValidation;
+
+    const monthValidation = this.validateMonth(month);
+    if (!monthValidation.isValid) return monthValidation;
+
+    const dayValidation = this.validateDay(day);
+    if (!dayValidation.isValid) return dayValidation;
+
+    return { isValid: true };
+  }
+
+  /**
+   * Crea una respuesta de error estándar
+   */
+  private createErrorResponse(message: string): CalendarUseCasesResponse {
+    return {
+      success: false,
+      message
+    };
+  }
+
+  /**
+   * Crea una respuesta de éxito estándar
+   */
+  private createSuccessResponse(message: string, data?: Calendar[], count?: number): CalendarUseCasesResponse {
+    return {
+      success: true,
+      message,
+      data,
+      count: count ?? data?.length
+    };
+  }
+
+  /**
+   * Maneja errores de forma consistente
+   */
+  private handleError(error: unknown, defaultMessage: string): CalendarUseCasesResponse {
+    console.error(defaultMessage, error);
+    return this.createErrorResponse(
+      error instanceof Error ? error.message : defaultMessage
+    );
+  }
+
+  /**
+   * Valida que la descripción del día festivo sea válida
+   */
+  private validateHolidayDescription(description: string): { isValid: boolean; message?: string } {
+    if (!description || description.trim().length === 0) {
+      return {
+        isValid: false,
+        message: 'Holiday description is required'
+      };
+    }
+    return { isValid: true };
+  }
+
+  /**
+   * Ejecuta una operación con manejo de errores estándar
+   */
+  private async executeWithErrorHandling<T>(
+    operation: () => Promise<T>,
+    errorMessage: string
+  ): Promise<T | CalendarUseCasesResponse> {
+    try {
+      return await operation();
+    } catch (error) {
+      return this.handleError(error, errorMessage);
+    }
+  }
+
+  /**
    * Crea un calendario completo para un año específico
    * @param request - Datos de la solicitud para crear el calendario
    * @returns Promise con el resultado de la operación
    */
   createCalendarByYear = async (request: CreateCalendarByYearRequest): Promise<CalendarUseCasesResponse> => {
-    try {
+    return this.executeWithErrorHandling(async () => {
       const { year, forceRegenerate = false } = request;
 
-      // Validar año
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+      const yearValidation = this.validateYear(year);
+      if (!yearValidation.isValid) {
+        return this.createErrorResponse(yearValidation.message!);
       }
 
-      // Verificar si ya existe calendario para este año
       const existsCalendar = await this.calendarRepository.existsByYear(year);
 
       if (existsCalendar && !forceRegenerate) {
         const existingCalendar = await this.calendarRepository.findByYear(year);
-        return {
-          success: true,
-          message: `Calendar for year ${year} already exists`,
-          data: existingCalendar,
-          count: existingCalendar.length
-        };
+        return this.createSuccessResponse(
+          `Calendar for year ${year} already exists`,
+          existingCalendar
+        );
       }
 
-      // Si existe y se fuerza la regeneración, borrar el existente
       if (existsCalendar && forceRegenerate) {
         await this.calendarRepository.deleteByYear(year);
       }
 
-      // Generar calendario usando el servicio de dominio
       const yearCalendar = this.calendarDomainService.generateYearCalendar(year);
-
-      // Guardar el calendario generado
       const savedCalendar = await this.calendarRepository.saveMany(yearCalendar);
 
-      return {
-        success: true,
-        message: `Calendar for year ${year} created successfully`,
-        data: savedCalendar,
-        count: savedCalendar.length
-      };
-
-    } catch (error) {
-      console.error('Error creating calendar by year:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while creating calendar'
-      };
-    }
+      return this.createSuccessResponse(
+        `Calendar for year ${year} created successfully`,
+        savedCalendar
+      );
+    }, 'Unknown error occurred while creating calendar') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -99,37 +194,25 @@ export class CalendarUseCases {
    * @returns Promise con el calendario del año
    */
   getCalendarByYear = async (year: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const yearValidation = this.validateYear(year);
+      if (!yearValidation.isValid) {
+        return this.createErrorResponse(yearValidation.message!);
       }
 
       const calendar = await this.calendarRepository.findByYear(year);
 
       if (!calendar || calendar.length === 0) {
-        return {
-          success: false,
-          message: `No calendar found for year ${year}. Consider creating it first.`
-        };
+        return this.createErrorResponse(
+          `No calendar found for year ${year}. Consider creating it first.`
+        );
       }
 
-      return {
-        success: true,
-        message: `Calendar for year ${year} retrieved successfully`,
-        data: calendar,
-        count: calendar.length
-      };
-
-    } catch (error) {
-      console.error('Error getting calendar by year:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving calendar'
-      };
-    }
+      return this.createSuccessResponse(
+        `Calendar for year ${year} retrieved successfully`,
+        calendar
+      );
+    }, 'Unknown error occurred while retrieving calendar') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -139,44 +222,30 @@ export class CalendarUseCases {
    * @returns Promise con el calendario del mes
    */
   getCalendarByYearAndMonth = async (year: number, month: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const yearValidation = this.validateYear(year);
+      if (!yearValidation.isValid) {
+        return this.createErrorResponse(yearValidation.message!);
       }
 
-      if (month < 1 || month > 12) {
-        return {
-          success: false,
-          message: 'Month must be between 1 and 12'
-        };
+      const monthValidation = this.validateMonth(month);
+      if (!monthValidation.isValid) {
+        return this.createErrorResponse(monthValidation.message!);
       }
 
       const calendar = await this.calendarRepository.findByYearAndMonth(year, month);
 
       if (!calendar || calendar.length === 0) {
-        return {
-          success: false,
-          message: `No calendar found for ${month}/${year}. Consider creating the calendar for year ${year} first.`
-        };
+        return this.createErrorResponse(
+          `No calendar found for ${month}/${year}. Consider creating the calendar for year ${year} first.`
+        );
       }
 
-      return {
-        success: true,
-        message: `Calendar for ${month}/${year} retrieved successfully`,
-        data: calendar,
-        count: calendar.length
-      };
-
-    } catch (error) {
-      console.error('Error getting calendar by year and month:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving calendar'
-      };
-    }
+      return this.createSuccessResponse(
+        `Calendar for ${month}/${year} retrieved successfully`,
+        calendar
+      );
+    }, 'Unknown error occurred while retrieving calendar') as Promise<CalendarUseCasesResponse>;
   }
 
   getYearsAndMonths = async (): Promise<ResDataByYears> => {
@@ -198,51 +267,25 @@ export class CalendarUseCases {
    * @returns Promise con la información del día
    */
   getCalendarDay = async (year: number, month: number, day: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
-      }
-
-      if (month < 1 || month > 12) {
-        return {
-          success: false,
-          message: 'Month must be between 1 and 12'
-        };
-      }
-
-      if (day < 1 || day > 31) {
-        return {
-          success: false,
-          message: 'Day must be between 1 and 31'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const dateValidation = this.validateDate(year, month, day);
+      if (!dateValidation.isValid) {
+        return this.createErrorResponse(dateValidation.message!);
       }
 
       const calendarDay = await this.calendarRepository.findByDate(year, month, day);
 
       if (!calendarDay) {
-        return {
-          success: false,
-          message: `No calendar day found for ${day}/${month}/${year}. Consider creating the calendar for year ${year} first.`
-        };
+        return this.createErrorResponse(
+          `No calendar day found for ${day}/${month}/${year}. Consider creating the calendar for year ${year} first.`
+        );
       }
 
-      return {
-        success: true,
-        message: `Calendar day ${day}/${month}/${year} retrieved successfully`,
-        data: [calendarDay],
-        count: 1
-      };
-
-    } catch (error) {
-      console.error('Error getting calendar day:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving calendar day'
-      };
-    }
+      return this.createSuccessResponse(
+        `Calendar day ${day}/${month}/${year} retrieved successfully`,
+        [calendarDay]
+      );
+    }, 'Unknown error occurred while retrieving calendar day') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -250,23 +293,14 @@ export class CalendarUseCases {
    * @returns Promise con todos los calendarios
    */
   getAllCalendars = async (): Promise<CalendarUseCasesResponse> => {
-    try {
+    return this.executeWithErrorHandling(async () => {
       const calendars = await this.calendarRepository.findAll();
 
-      return {
-        success: true,
-        message: `Retrieved ${calendars.length} calendar entries successfully`,
-        data: calendars,
-        count: calendars.length
-      };
-
-    } catch (error) {
-      console.error('Error getting all calendars:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving calendars'
-      };
-    }
+      return this.createSuccessResponse(
+        `Retrieved ${calendars.length} calendar entries successfully`,
+        calendars
+      );
+    }, 'Unknown error occurred while retrieving calendars') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -275,37 +309,22 @@ export class CalendarUseCases {
    * @returns Promise con el resultado de la operación
    */
   deleteCalendarByYear = async (year: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const yearValidation = this.validateYear(year);
+      if (!yearValidation.isValid) {
+        return this.createErrorResponse(yearValidation.message!);
       }
 
       const existsCalendar = await this.calendarRepository.existsByYear(year);
 
       if (!existsCalendar) {
-        return {
-          success: false,
-          message: `No calendar found for year ${year}`
-        };
+        return this.createErrorResponse(`No calendar found for year ${year}`);
       }
 
       await this.calendarRepository.deleteByYear(year);
 
-      return {
-        success: true,
-        message: `Calendar for year ${year} deleted successfully`
-      };
-
-    } catch (error) {
-      console.error('Error deleting calendar by year:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while deleting calendar'
-      };
-    }
+      return this.createSuccessResponse(`Calendar for year ${year} deleted successfully`);
+    }, 'Unknown error occurred while deleting calendar') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -314,70 +333,37 @@ export class CalendarUseCases {
    * @returns Promise con el resultado de la operación
    */
   addManualHoliday = async (request: ManualHolidayRequest): Promise<CalendarUseCasesResponse> => {
-    try {
+    return this.executeWithErrorHandling(async () => {
       const { year, month, day, description } = request;
 
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+      const dateValidation = this.validateDate(year, month, day);
+      if (!dateValidation.isValid) {
+        return this.createErrorResponse(dateValidation.message!);
       }
 
-      if (month < 1 || month > 12) {
-        return {
-          success: false,
-          message: 'Month must be between 1 and 12'
-        };
+      const descriptionValidation = this.validateHolidayDescription(description);
+      if (!descriptionValidation.isValid) {
+        return this.createErrorResponse(descriptionValidation.message!);
       }
 
-      if (day < 1 || day > 31) {
-        return {
-          success: false,
-          message: 'Day must be between 1 and 31'
-        };
-      }
-
-      if (!description || description.trim().length === 0) {
-        return {
-          success: false,
-          message: 'Holiday description is required'
-        };
-      }
-
-      // Verificar que existe el día en el calendario
       const existingDay = await this.calendarRepository.findByDate(year, month, day);
       if (!existingDay) {
-        return {
-          success: false,
-          message: `Calendar day ${day}/${month}/${year} not found. Create the calendar for year ${year} first.`
-        };
+        return this.createErrorResponse(
+          `Calendar day ${day}/${month}/${year} not found. Create the calendar for year ${year} first.`
+        );
       }
 
-      // Agregar el día festivo manual
       const updatedDay = await this.calendarRepository.addManualHoliday(year, month, day, description.trim());
 
       if (!updatedDay) {
-        return {
-          success: false,
-          message: 'Failed to add manual holiday'
-        };
+        return this.createErrorResponse('Failed to add manual holiday');
       }
 
-      return {
-        success: true,
-        message: `Manual holiday "${description}" added successfully for ${day}/${month}/${year}`,
-        data: [updatedDay],
-        count: 1
-      };
-
-    } catch (error) {
-      console.error('Error adding manual holiday:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while adding manual holiday'
-      };
-    }
+      return this.createSuccessResponse(
+        `Manual holiday "${description}" added successfully for ${day}/${month}/${year}`,
+        [updatedDay]
+      );
+    }, 'Unknown error occurred while adding manual holiday') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -388,77 +374,41 @@ export class CalendarUseCases {
    * @returns Promise con el resultado de la operación
    */
   removeManualHoliday = async (year: number, month: number, day: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const dateValidation = this.validateDate(year, month, day);
+      if (!dateValidation.isValid) {
+        return this.createErrorResponse(dateValidation.message!);
       }
 
-      if (month < 1 || month > 12) {
-        return {
-          success: false,
-          message: 'Month must be between 1 and 12'
-        };
-      }
-
-      if (day < 1 || day > 31) {
-        return {
-          success: false,
-          message: 'Day must be between 1 and 31'
-        };
-      }
-
-      // Verificar que el día existe y es un holiday
       const existingDay = await this.calendarRepository.findByDate(year, month, day);
       if (!existingDay) {
-        return {
-          success: false,
-          message: `Calendar day ${day}/${month}/${year} not found`
-        };
+        return this.createErrorResponse(`Calendar day ${day}/${month}/${year} not found`);
       }
 
       if (!existingDay.isHoliday) {
-        return {
-          success: false,
-          message: `Day ${day}/${month}/${year} is not currently marked as a holiday`
-        };
+        return this.createErrorResponse(
+          `Day ${day}/${month}/${year} is not currently marked as a holiday`
+        );
       }
 
-      // Verificar si es un día festivo fijo (no se puede remover)
       const fixedHolidayInfo = this.calendarDomainService.isFixedHoliday(month, day);
       if (fixedHolidayInfo.isHoliday) {
-        return {
-          success: false,
-          message: `Cannot remove fixed holiday "${fixedHolidayInfo.description}" on ${day}/${month}. Fixed holidays cannot be modified.`
-        };
+        return this.createErrorResponse(
+          `Cannot remove fixed holiday "${fixedHolidayInfo.description}" on ${day}/${month}. Fixed holidays cannot be modified.`
+        );
       }
 
-      // Remover el día festivo manual
       const updatedDay = await this.calendarRepository.removeManualHoliday(year, month, day);
 
       if (!updatedDay) {
-        return {
-          success: false,
-          message: 'Failed to remove manual holiday'
-        };
+        return this.createErrorResponse('Failed to remove manual holiday');
       }
 
-      return {
-        success: true,
-        message: `Manual holiday removed successfully for ${day}/${month}/${year}`,
-        data: [updatedDay],
-        count: 1
-      };
-
-    } catch (error) {
-      console.error('Error removing manual holiday:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while removing manual holiday'
-      };
-    }
+      return this.createSuccessResponse(
+        `Manual holiday removed successfully for ${day}/${month}/${year}`,
+        [updatedDay]
+      );
+    }, 'Unknown error occurred while removing manual holiday') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -467,62 +417,34 @@ export class CalendarUseCases {
    * @returns Promise con el resultado de la operación
    */
   updateHolidayStatus = async (request: UpdateHolidayRequest): Promise<CalendarUseCasesResponse> => {
-    try {
+    return this.executeWithErrorHandling(async () => {
       const { year, month, day, isHoliday, description } = request;
 
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+      const dateValidation = this.validateDate(year, month, day);
+      if (!dateValidation.isValid) {
+        return this.createErrorResponse(dateValidation.message!);
       }
 
-      if (month < 1 || month > 12) {
-        return {
-          success: false,
-          message: 'Month must be between 1 and 12'
-        };
-      }
-
-      if (day < 1 || day > 31) {
-        return {
-          success: false,
-          message: 'Day must be between 1 and 31'
-        };
-      }
-
-      // Verificar que el día existe
       const existingDay = await this.calendarRepository.findByDate(year, month, day);
       if (!existingDay) {
-        return {
-          success: false,
-          message: `Calendar day ${day}/${month}/${year} not found`
-        };
+        return this.createErrorResponse(`Calendar day ${day}/${month}/${year} not found`);
       }
 
-      // Verificar si es un día festivo fijo y se está intentando desactivar
       const fixedHolidayInfo = this.calendarDomainService.isFixedHoliday(month, day);
       if (fixedHolidayInfo.isHoliday && !isHoliday) {
-        return {
-          success: false,
-          message: `Cannot disable fixed holiday "${fixedHolidayInfo.description}" on ${day}/${month}. Fixed holidays cannot be modified.`
-        };
+        return this.createErrorResponse(
+          `Cannot disable fixed holiday "${fixedHolidayInfo.description}" on ${day}/${month}. Fixed holidays cannot be modified.`
+        );
       }
 
-      // Si se está activando como holiday, verificar que tenga descripción
       if (isHoliday && (!description || description.trim().length === 0)) {
-        // Si es un día festivo fijo, usar su descripción
-        if (fixedHolidayInfo.isHoliday) {
-          // Ya tiene descripción por defecto, no hacer nada
-        } else {
-          return {
-            success: false,
-            message: 'Holiday description is required when marking a day as holiday'
-          };
+        if (!fixedHolidayInfo.isHoliday) {
+          return this.createErrorResponse(
+            'Holiday description is required when marking a day as holiday'
+          );
         }
       }
 
-      // Actualizar el estado del holiday
       const updatedDay = await this.calendarRepository.updateHolidayStatus(
         year,
         month,
@@ -532,26 +454,14 @@ export class CalendarUseCases {
       );
 
       if (!updatedDay) {
-        return {
-          success: false,
-          message: 'Failed to update holiday status'
-        };
+        return this.createErrorResponse('Failed to update holiday status');
       }
 
-      return {
-        success: true,
-        message: `Holiday status updated successfully for ${day}/${month}/${year}`,
-        data: [updatedDay],
-        count: 1
-      };
-
-    } catch (error) {
-      console.error('Error updating holiday status:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while updating holiday status'
-      };
-    }
+      return this.createSuccessResponse(
+        `Holiday status updated successfully for ${day}/${month}/${year}`,
+        [updatedDay]
+      );
+    }, 'Unknown error occurred while updating holiday status') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -560,30 +470,19 @@ export class CalendarUseCases {
    * @returns Promise con los días festivos del año
    */
   getHolidaysByYear = async (year: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const yearValidation = this.validateYear(year);
+      if (!yearValidation.isValid) {
+        return this.createErrorResponse(yearValidation.message!);
       }
 
       const holidays = await this.calendarRepository.findHolidaysByYear(year);
 
-      return {
-        success: true,
-        message: `Retrieved ${holidays.length} holidays for year ${year}`,
-        data: holidays,
-        count: holidays.length
-      };
-
-    } catch (error) {
-      console.error('Error getting holidays by year:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving holidays'
-      };
-    }
+      return this.createSuccessResponse(
+        `Retrieved ${holidays.length} holidays for year ${year}`,
+        holidays
+      );
+    }, 'Unknown error occurred while retrieving holidays') as Promise<CalendarUseCasesResponse>;
   }
 
   /**
@@ -612,50 +511,24 @@ export class CalendarUseCases {
    * @returns Promise con la información de la fecha
    */
   getDateInfo = async (year: number, month: number, day: number): Promise<CalendarUseCasesResponse> => {
-    try {
-      if (year < 1900 || year > 2100) {
-        return {
-          success: false,
-          message: 'Year must be between 1900 and 2100'
-        };
-      }
-
-      if (month < 1 || month > 12) {
-        return {
-          success: false,
-          message: 'Month must be between 1 and 12'
-        };
-      }
-
-      if (day < 1 || day > 31) {
-        return {
-          success: false,
-          message: 'Day must be between 1 and 31'
-        };
+    return this.executeWithErrorHandling(async () => {
+      const dateValidation = this.validateDate(year, month, day);
+      if (!dateValidation.isValid) {
+        return this.createErrorResponse(dateValidation.message!);
       }
 
       const calendar = await this.calendarRepository.findByDate(year, month, day);
 
       if (!calendar) {
-        return {
-          success: false,
-          message: `No information found for date ${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}. The calendar for this year may not exist.`
-        };
+        return this.createErrorResponse(
+          `No information found for date ${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}. The calendar for this year may not exist.`
+        );
       }
 
-      return {
-        success: true,
-        message: `Date information retrieved successfully`,
-        data: [calendar],
-        count: 1
-      };
-
-    } catch (error) {
-      console.error('Error getting date info:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred while retrieving date information'
-      };
-    }
+      return this.createSuccessResponse(
+        'Date information retrieved successfully',
+        [calendar]
+      );
+    }, 'Unknown error occurred while retrieving date information') as Promise<CalendarUseCasesResponse>;
   }
 }

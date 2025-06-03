@@ -36,12 +36,6 @@ export const CalendarDayCell = memo(({
             {day.days}
           </div>
 
-          {day.nameDay && day.nameDay.trim() !== "" && (
-            <div className="text-xs text-slate-600 mb-2 truncate font-medium">
-              {day.nameDay}
-            </div>
-          )}
-
           <ScheduledEmployees 
             schedules={dayWorkSchedules}
             getShiftName={getShiftName}
