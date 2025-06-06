@@ -150,8 +150,7 @@ export class CalendarRepoMysql implements CalendarRepository {
             await CalendarModel.sync();
             const [affectedRows] = await CalendarModel.update({
                 isHoliday,
-                holidayDescription: isHoliday ? description || null : null,
-                updatedAt: new Date()
+                holidayDescription: isHoliday ? description || null : null
             }, {
                 where: { year, month, days: day }
             });
