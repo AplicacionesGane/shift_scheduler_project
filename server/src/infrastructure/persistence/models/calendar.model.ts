@@ -1,4 +1,4 @@
-import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
+import { Model, DataTypes, type InferAttributes, type InferCreationAttributes, CreationOptional } from 'sequelize';
 import { sequelize } from '@/infrastructure/persistence/connection';
 
 class CalendarModel extends Model<InferAttributes<CalendarModel>, InferCreationAttributes<CalendarModel>> {
@@ -11,8 +11,8 @@ class CalendarModel extends Model<InferAttributes<CalendarModel>, InferCreationA
     declare nameDay: string;
     declare nameMonth: string;
     declare holidayDescription?: string | null;
-    declare createdAt?: Date;
-    declare updatedAt?: Date;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
 }
 
 CalendarModel.init({
@@ -24,12 +24,13 @@ CalendarModel.init({
     isWeekend: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     nameDay: { type: DataTypes.STRING(20), allowNull: false },
     nameMonth: { type: DataTypes.STRING(20), allowNull: false },
-    holidayDescription: { type: DataTypes.STRING(100), allowNull: true, defaultValue: null }
+    holidayDescription: { type: DataTypes.STRING(100), allowNull: true, defaultValue: null },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
 }, {
     sequelize,
     modelName: 'Calendar',
     tableName: 'CALENDAR',
-    timestamps: true,
 });
 
 export { CalendarModel };
