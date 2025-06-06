@@ -1,17 +1,6 @@
 import { Calendar } from '@domain/entities/calendar.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface CalendarValueDTO {
-    year: number;
-    month: number;
-    days: number;
-    isHoliday?: boolean;
-    isWeekend?: boolean;
-    nameDay?: string;
-    nameMonth?: string;
-    holidayDescription?: string | null;
-}
-
 export class CalendarValue implements Calendar {
     id: string;
     year: number;
@@ -22,10 +11,10 @@ export class CalendarValue implements Calendar {
     nameDay: string;
     nameMonth: string;
     holidayDescription?: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 
-    constructor(calendarData: CalendarValueDTO) {
+    constructor(calendarData: Calendar) {
         // Validaciones
         if (calendarData.year < 1900 || calendarData.year > 2100) {
             throw new Error('Invalid year. Year must be between 1900 and 2100');
@@ -46,16 +35,16 @@ export class CalendarValue implements Calendar {
         }
 
         this.id = uuidv4();
-        this.year = calendarData.year;
-        this.month = calendarData.month;
-        this.days = calendarData.days;
-        this.isHoliday = calendarData.isHoliday || false;
-        this.isWeekend = calendarData.isWeekend || false;
-        this.nameDay = calendarData.nameDay || this.getDayName(calendarData.year, calendarData.month, calendarData.days);
-        this.nameMonth = calendarData.nameMonth || this.getMonthName(calendarData.month);
-        this.holidayDescription = calendarData.holidayDescription || null;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
+        this.year = calendarData.year
+        this.month = calendarData.month
+        this.days = calendarData.days
+        this.isHoliday = calendarData.isHoliday || false
+        this.isWeekend = calendarData.isWeekend || false
+        this.nameDay = calendarData.nameDay || this.getDayName(calendarData.year, calendarData.month, calendarData.days)
+        this.nameMonth = calendarData.nameMonth || this.getMonthName(calendarData.month)
+        this.holidayDescription = calendarData.holidayDescription || null
+        this.createdAt = calendarData.createdAt
+        this.updatedAt = calendarData.updatedAt
     }
 
     private getDaysInMonth(year: number, month: number): number {
