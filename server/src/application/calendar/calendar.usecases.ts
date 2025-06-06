@@ -40,10 +40,10 @@ export class CalendarUseCases {
    * Valida que el año esté en el rango permitido
    */
   private validateYear(year: number): { isValid: boolean; message?: string } {
-    if (year < 1900 || year > 2100) {
+    if (year < 2024 || year > 2100) {
       return {
         isValid: false,
-        message: 'Year must be between 1900 and 2100'
+        message: 'Year must be between 2024 and 2100'
       };
     }
     return { isValid: true };
