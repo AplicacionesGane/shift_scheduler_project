@@ -24,44 +24,40 @@ export class CalendarDomainService implements ICalendarDomainService {
 
         for (let month = 1; month <= 12; month++) {
             const daysInMonth = this.getDaysInMonth(year, month);
-            
+
             for (let day = 1; day <= daysInMonth; day++) {
                 const isWeekend = this.isWeekend(year, month, day);
                 const fixedHolidayInfo = this.isFixedHoliday(month, day);
-                
-                const calendarDay = new CalendarValue({
+
+                const calendarEntry = new CalendarValue(
                     year,
                     month,
-                    days: day,
-                    isHoliday: fixedHolidayInfo.isHoliday,
+                    day,
+                    fixedHolidayInfo.isHoliday,
                     isWeekend,
-                    holidayDescription: fixedHolidayInfo.description || null
-                });
+                    fixedHolidayInfo.description
+                );
                 
-                calendar.push(calendarDay);
+                calendar.push(calendarEntry);
             }
         }
 
         return calendar;
     }
 
-    isWeekend(year: number, month: number, day: number): boolean {
+    isWeekend = (year: number, month: number, day: number): boolean => {
         const date = new Date(year, month - 1, day);
         const dayOfWeek = date.getDay();
         return dayOfWeek === 0 || dayOfWeek === 6; // Domingo = 0, Sábado = 6
     }
 
-    isFixedHoliday(month: number, day: number): { isHoliday: boolean; description?: string } {
+    isFixedHoliday = (month: number, day: number): { isHoliday: boolean; description?: string } => {
         const monthStr = month.toString().padStart(2, '0');
         const dayStr = day.toString().padStart(2, '0');
         const dateKey = `${monthStr}-${dayStr}`;
-        
         const description = this.fixedHolidaysInColombia.get(dateKey);
-        
-        return {
-            isHoliday: !!description,
-            description
-        };
+
+        return { isHoliday: !!description, description };
     }
 
     private getDaysInMonth(year: number, month: number): number {
