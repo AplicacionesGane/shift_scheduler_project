@@ -2,7 +2,7 @@ import { Model, DataTypes, type InferAttributes, type InferCreationAttributes, C
 import { sequelize } from '@/infrastructure/persistence/connection';
 
 class CalendarModel extends Model<InferAttributes<CalendarModel>, InferCreationAttributes<CalendarModel>> {
-    declare id?: string;
+    declare id: CreationOptional<string>;
     declare year: number;
     declare month: number;
     declare days: number;
