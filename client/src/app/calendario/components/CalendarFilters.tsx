@@ -51,8 +51,8 @@ export const CalendarFilters = memo(({
         >
           <option value="">Seleccionar Mes</option>
           {dataDates?.months?.map((month, index) => (
-            <option key={index} value={month.numero.toString()}>
-              {month.nameMonth}
+            <option key={index} value={month.number.toString()}>
+              {month.name}
             </option>
           ))}
         </select>
