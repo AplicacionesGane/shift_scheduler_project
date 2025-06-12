@@ -2,6 +2,7 @@ import { CalendarRepoMysql } from '@/infrastructure/repositories/mysql/CalendarR
 import { CalendarController } from '@presentation/controllers/calendar.controller';
 import { CalendarUseCases } from '@application/calendar/calendar.usecases';
 import { Router } from 'express';
+import { CalendarRepoMongo } from '@/infrastructure/repositories/mongo/CalendarRepoMongo';
 
 const routerCalendar = Router();
 
@@ -10,19 +11,30 @@ const routerCalendar = Router();
  */
 const repository = new CalendarRepoMysql();
 
+const repository2 = new CalendarRepoMongo();
+
 /**
  * Initialize use cases
  */
 const usecases = new CalendarUseCases(repository);
+
+const usecases2 = new CalendarUseCases(repository2);
 
 /**
  * Initialize controllers
  */
 const controllers = new CalendarController(usecases);
 
+const controllers2 = new CalendarController(usecases2);
+
 /**
  * Define routes
  */
+
+// Calendar management routes using mongo repository
+
+routerCalendar.get('/calendar/mongo', controllers2.getAllCalendarsCtrl);
+routerCalendar.post('/calendar/mongo/year', controllers2.createCalendarByYearCtrl);
 
 // Calendar management routes
 routerCalendar.get('/calendar', controllers.getAllCalendarsCtrl);
