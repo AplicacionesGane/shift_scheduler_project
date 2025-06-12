@@ -1,4 +1,4 @@
-import { StoreModel } from '@infrastructure/persistence/models/store.model';
+import { StoreModel } from '@/infrastructure/persistence/models/sequelize/store.model';
 import { StoreRepository } from '@domain/repositories/store.repository';
 import { StoreEntity } from '@domain/entities/store.entity';
 
