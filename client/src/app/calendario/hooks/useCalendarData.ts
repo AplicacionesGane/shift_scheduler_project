@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { API_SERVER_URL } from '@/utils/constants';
 import type { DayCalendar, MonthData } from '../types';
+import { API_SERVER_URL } from '@/utils/constants';
+import axios from 'axios';
 
 export const useCalendarData = () => {
   const [dataDates, setDataDates] = useState<MonthData | null>(null);
@@ -34,7 +34,7 @@ export const useCalendarData = () => {
         const response = await axios.get(
           `${API_SERVER_URL}/calendar/year/${selectedYear}/month/${selectedMonth}`
         );
-        setDayCalendar(response.data.data);
+        setDayCalendar(response.data);
       } catch (error) {
         console.error('Error loading calendar days:', error);
       } finally {
