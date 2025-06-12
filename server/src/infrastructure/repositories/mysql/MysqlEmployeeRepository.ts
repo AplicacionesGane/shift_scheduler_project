@@ -1,4 +1,4 @@
-import { EmployeeModel } from '@infrastructure/persistence/models/employee.model';
+import { EmployeeModel } from '@/infrastructure/persistence/models/sequelize/employee.model';
 import { EmployeeRepository } from "@/domain/repositories/employee.repository";
 import { EmployeeEntity } from "@/domain/entities/employe.entity";
 

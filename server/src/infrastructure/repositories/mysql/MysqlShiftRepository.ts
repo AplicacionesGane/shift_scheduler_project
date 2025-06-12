@@ -1,4 +1,4 @@
-import { ShiftModel } from '@infrastructure/persistence/models/shitf.model';
+import { ShiftModel } from '@/infrastructure/persistence/models/sequelize/shitf.model';
 import { ShiftRepository } from '@domain/repositories/shift.repository';
 import { Shift } from '@domain/entities/shift.entity';
 
