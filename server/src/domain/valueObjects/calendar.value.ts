@@ -1,17 +1,6 @@
 import { Calendar } from '@domain/entities/calendar.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface CalendarValueDTO {
-    year: number;
-    month: number;
-    days: number;
-    isHoliday?: boolean;
-    isWeekend?: boolean;
-    nameDay?: string;
-    nameMonth?: string;
-    holidayDescription?: string | null;
-}
-
 export class CalendarValue implements Calendar {
     id: string;
     year: number;
@@ -22,40 +11,43 @@ export class CalendarValue implements Calendar {
     nameDay: string;
     nameMonth: string;
     holidayDescription?: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 
-    constructor(calendarData: CalendarValueDTO) {
+    constructor(
+        year: number, month: number, day: number,
+        isHoliday: boolean = false,
+        isWeekend: boolean = false,
+        holidayDescription?: string | null
+    ) {
         // Validaciones
-        if (calendarData.year < 1900 || calendarData.year > 2100) {
-            throw new Error('Invalid year. Year must be between 1900 and 2100');
+        if (year < 2024 || year > 2100) {
+            throw new Error('Invalid year. Year must be between 2024 and 2100');
         }
 
-        if (calendarData.month < 1 || calendarData.month > 12) {
+        if (month < 1 || month > 12) {
             throw new Error('Invalid month. Month must be between 1 and 12');
         }
 
-        if (calendarData.days < 1 || calendarData.days > 31) {
+        if (day < 1 || day > 31) {
             throw new Error('Invalid day. Day must be between 1 and 31');
         }
 
         // Validar que el día sea válido para el mes
-        const daysInMonth = this.getDaysInMonth(calendarData.year, calendarData.month);
-        if (calendarData.days > daysInMonth) {
-            throw new Error(`Invalid day. Month ${calendarData.month} of year ${calendarData.year} only has ${daysInMonth} days`);
+        const daysInMonth = this.getDaysInMonth(year, month);
+        if (day > daysInMonth) {
+            throw new Error(`Invalid day. Month ${month} of year ${year} only has ${daysInMonth} days`);
         }
 
         this.id = uuidv4();
-        this.year = calendarData.year;
-        this.month = calendarData.month;
-        this.days = calendarData.days;
-        this.isHoliday = calendarData.isHoliday || false;
-        this.isWeekend = calendarData.isWeekend || false;
-        this.nameDay = calendarData.nameDay || this.getDayName(calendarData.year, calendarData.month, calendarData.days);
-        this.nameMonth = calendarData.nameMonth || this.getMonthName(calendarData.month);
-        this.holidayDescription = calendarData.holidayDescription || null;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
+        this.year = year;
+        this.month = month;
+        this.days = day;
+        this.isHoliday = isHoliday;
+        this.isWeekend = isWeekend;
+        this.nameDay = this.getDayName(year, month, day);
+        this.nameMonth = this.getMonthName(month);
+        this.holidayDescription = holidayDescription || null;
     }
 
     private getDaysInMonth(year: number, month: number): number {

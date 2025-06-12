@@ -1,4 +1,136 @@
-import { CalendarRepository, ResDataByYears } from "@domain/repositories/calendar.repository";
+import { CalendarModel } from '@infrastructure/persistence/models/calendar.model';
+import { CalendarRepository } from '@domain/repositories/calendar.repository';
+import { Calendar } from '@domain/entities/calendar.entity';
+
+export class CalendarRepoMysql implements CalendarRepository {
+
+    findAll = async (): Promise<Calendar[] | []> => {
+        await CalendarModel.sync(); // Ensure the table is synchronized
+        try {
+            const calendars = await CalendarModel.findAll({
+                order: [['year', 'ASC'], ['month', 'ASC'], ['days', 'ASC']]
+            });
+
+            if (!calendars || calendars.length === 0) return [];
+
+            // Map the Sequelize model to our Calendar entity
+            const calendarEntities: Calendar[] = calendars.map(calendar => ({
+                id: calendar.dataValues.id,
+                year: calendar.dataValues.year,
+                month: calendar.dataValues.month,
+                days: calendar.dataValues.days,
+                isHoliday: calendar.dataValues.isHoliday,
+                isWeekend: calendar.dataValues.isWeekend,
+                nameDay: calendar.dataValues.nameDay,
+                holidayDescription: calendar.dataValues.holidayDescription,
+                nameMonth: calendar.dataValues.nameMonth,
+                createdAt: calendar.dataValues.createdAt,
+                updatedAt: calendar.dataValues.updatedAt
+            }));
+
+            return calendarEntities;
+        } catch (error) {
+            console.error('Error finding all calendars:', error);
+            throw new Error('Error finding all calendars from database');
+        }
+    }
+
+    saveMany = async (calendars: Calendar[]): Promise<Calendar[]> => {
+        await CalendarModel.sync(); // Ensure the table is synchronized
+        try {
+            const newCalendar = await CalendarModel.bulkCreate(calendars, {
+                returning: true,
+                validate: true
+            });
+
+            if (!newCalendar || newCalendar.length === 0) return [];
+
+            // Map the Sequelize model to our Calendar entity
+            const calendarEntities: Calendar[] = newCalendar.map(calendar => ({
+                id: calendar.dataValues.id,
+                year: calendar.dataValues.year,
+                month: calendar.dataValues.month,
+                days: calendar.dataValues.days,
+                isHoliday: calendar.dataValues.isHoliday,
+                isWeekend: calendar.dataValues.isWeekend,
+                nameDay: calendar.dataValues.nameDay,
+                holidayDescription: calendar.dataValues.holidayDescription,
+                nameMonth: calendar.dataValues.nameMonth,
+                createdAt: calendar.dataValues.createdAt,
+                updatedAt: calendar.dataValues.updatedAt
+            }));
+
+            return calendarEntities;
+        } catch (error) {
+            console.log(error);
+            throw new Error('Error saving multiple calendars to database');
+        }
+    }
+
+    findByYear = async (year: number): Promise<Calendar[] | []> => {
+        try {
+            await CalendarModel.sync(); // Ensure the table is synchronized
+            const calendars = await CalendarModel.findAll({
+                where: { year },
+                order: [['month', 'ASC'], ['days', 'ASC']]
+            });
+
+            if (!calendars || calendars.length === 0) return [];
+
+            // Map the Sequelize model to our Calendar entity
+            const calendarEntities: Calendar[] = calendars.map(calendar => ({
+                id: calendar.dataValues.id,
+                year: calendar.dataValues.year,
+                month: calendar.dataValues.month,
+                days: calendar.dataValues.days,
+                isHoliday: calendar.dataValues.isHoliday,
+                isWeekend: calendar.dataValues.isWeekend,
+                nameDay: calendar.dataValues.nameDay,
+                holidayDescription: calendar.dataValues.holidayDescription,
+                nameMonth: calendar.dataValues.nameMonth,
+                createdAt: calendar.dataValues.createdAt,
+                updatedAt: calendar.dataValues.updatedAt
+            }));
+
+            return calendarEntities;
+        } catch (error) {
+            console.log(error);
+            throw new Error('Error finding calendars by year from database');
+        }
+    }
+
+    findByYearAndMonth = async (year: number, month: number): Promise<Calendar[] | []> => {
+        try {
+            await CalendarModel.sync(); // Ensure the table is synchronized
+            const calendars = await CalendarModel.findAll({
+                where: { year, month },
+                order: [['days', 'ASC']]
+            });
+            if (!calendars || calendars.length === 0) return [];
+            // Map the Sequelize model to our Calendar entity
+            const calendarEntities: Calendar[] = calendars.map(calendar => ({
+                id: calendar.dataValues.id,
+                year: calendar.dataValues.year,
+                month: calendar.dataValues.month,
+                days: calendar.dataValues.days,
+                isHoliday: calendar.dataValues.isHoliday,
+                isWeekend: calendar.dataValues.isWeekend,
+                nameDay: calendar.dataValues.nameDay,
+                holidayDescription: calendar.dataValues.holidayDescription,
+                nameMonth: calendar.dataValues.nameMonth,
+                createdAt: calendar.dataValues.createdAt,
+                updatedAt: calendar.dataValues.updatedAt
+            }));
+            return calendarEntities;
+        } catch (error) {
+            console.log(error);
+            throw new Error('Error finding calendars by year and month from database');
+        }
+    }
+
+}
+
+/*import { CalendarRepository, ResDataByYears } from "@domain/repositories/calendar.repository";
 import { CalendarModel } from "@infrastructure/persistence/models/calendar.model";
 import { Calendar } from "@domain/entities/calendar.entity";
 import { fn, QueryTypes } from "sequelize";
@@ -150,8 +282,7 @@ export class CalendarRepoMysql implements CalendarRepository {
             await CalendarModel.sync();
             const [affectedRows] = await CalendarModel.update({
                 isHoliday,
-                holidayDescription: isHoliday ? description || null : null,
-                updatedAt: new Date()
+                holidayDescription: isHoliday ? description || null : null
             }, {
                 where: { year, month, days: day }
             });
@@ -238,3 +369,4 @@ export class CalendarRepoMysql implements CalendarRepository {
         }
     }
 }
+    */
