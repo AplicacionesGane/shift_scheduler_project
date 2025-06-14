@@ -1,4 +1,4 @@
-import { CalendarModel } from '@infrastructure/persistence/models/calendar.model';
+import { CalendarModel } from '@/infrastructure/persistence/models/sequelize/calendar.model';
 import { CalendarRepository } from '@domain/repositories/calendar.repository';
 import { Calendar } from '@domain/entities/calendar.entity';
 

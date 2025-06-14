@@ -5,12 +5,14 @@ import { routerShift } from './presentation/routes/shift.routes';
 import { routerCalendar } from './presentation/routes/calendar.routes';
 
 import { SimpleLogger } from '@/presentation/middleware/simple-logger.middleware';
+import { connectToMongoDB } from '@/infrastructure/persistence/connection/mongodb';
 import { sequelize } from '@/infrastructure/persistence/connection';
 
 import express from 'express';
 import cors from 'cors';
 
 const app = express();
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mydatabase';
 
 // Middleware to parse JSON bodies
 app.disable('x-powered-by')
@@ -45,6 +47,15 @@ sequelize.authenticate()
     .catch((error) => {
         console.error('Unable to connect to the database:', error);
         process.exit(1); // Exit the process if the database connection fails
+    });
+
+connectToMongoDB(MONGO_URI)
+    .then(() => {
+        console.log('Connected to MongoDB successfully');
+    })
+    .catch((error) => {
+        console.error('Error connecting to MongoDB:', error);
+        process.exit(1); // Exit the process if the MongoDB connection fails
     });
 
 // Start the server

@@ -1,4 +1,4 @@
-import { WorkScheduleModel } from '@infrastructure/persistence/models/workschedule.model';
+import { WorkScheduleModel } from '@/infrastructure/persistence/models/sequelize/workschedule.model';
 import { WorkScheduleRepository } from '@domain/repositories/workschedule.repository';
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 
