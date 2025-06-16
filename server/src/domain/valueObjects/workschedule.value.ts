@@ -1,16 +1,6 @@
 import { WorkSchedule } from '@domain/entities/workschedule.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface WorkScheduleValueDTO {
-    employee: string;
-    shiftId: string;
-    storeId: string;
-    year: number;
-    month: number;
-    day: number;
-    status: 'assigned' | 'completed' | 'absent';
-}
-
 export class WorkScheduleValue implements WorkSchedule {
     id: string;
     employee: string; 
@@ -20,10 +10,10 @@ export class WorkScheduleValue implements WorkSchedule {
     month: number;
     day: number;
     status: 'assigned' | 'completed' | 'absent';
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 
-    constructor(workSchedule: WorkScheduleValueDTO) {
+    constructor(workSchedule: WorkSchedule) {
         // validate year
         if (workSchedule.year < 1900 || workSchedule.year > 2100) {
             throw new Error('Invalid year to assign work schedule');
@@ -45,7 +35,5 @@ export class WorkScheduleValue implements WorkSchedule {
         this.month = workSchedule.month;
         this.day = workSchedule.day;
         this.status = workSchedule.status;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
     }
 }
