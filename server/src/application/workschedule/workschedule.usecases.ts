@@ -1,4 +1,4 @@
-import { WorkScheduleValue, WorkScheduleValueDTO } from '@domain/valueObjects/workschedule.value';
+import { WorkScheduleValue } from '@domain/valueObjects/workschedule.value';
 import { WorkScheduleRepository } from '@domain/repositories/workschedule.repository';
 import { EmployeeRepository } from '@domain/repositories/employee.repository';
 import { ShiftRepository } from '@domain/repositories/shift.repository';
@@ -13,7 +13,7 @@ export class WorkScheduleUseCases {
     private readonly storeRepo: StoreRepository
   ) { }
 
-  createNewSchedule = async (newSchedule: WorkScheduleValueDTO): Promise<WorkSchedule> => {
+  createNewSchedule = async (newSchedule: WorkSchedule): Promise<WorkSchedule> => {
 
     // 1. valida que el empleado exista
     const employee = await this.employeeRepo.findEmployeeById(newSchedule.employee);
