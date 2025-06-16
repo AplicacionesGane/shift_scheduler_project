@@ -29,4 +29,9 @@ export class CalendarUseCases {
     const calendars = await this.calendarRepo.findByYearAndMonth(year, month);
     return calendars;
   }
+
+  findYearsAndMonths = async (): Promise<{ years: number[]; months: { number: number; name: string }[] }> => {
+    const data = await this.calendarRepo.findYearsAndMonths();
+    return data;
+  }
 }

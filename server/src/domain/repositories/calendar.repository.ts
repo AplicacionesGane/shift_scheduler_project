@@ -10,8 +10,11 @@ export interface CalendarRepository {
   saveMany(calendars: Calendar[]): Promise<Calendar[]>;
   findByYear(year: number): Promise<Calendar[] | []>;
   findByYearAndMonth(year: number, month: number): Promise<Calendar[] | []>;
-  
-  // findYearsAndMonths(): Promise<ResDataByYears>;
+
+  // obtener años y meses únicos
+  findYearsAndMonths(): Promise<{ years: number[]; months: { number: number; name: string }[] }>;
+
+
   // findByDate(year: number, month: number, day: number): Promise<Calendar | null>;
   // deleteByYear(year: number): Promise<void>;
   // existsByYear(year: number): Promise<boolean>;

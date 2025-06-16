@@ -1,4 +1,4 @@
-import { Model, DataTypes, type InferAttributes, type InferCreationAttributes } from 'sequelize';
+import { Model, DataTypes, type InferAttributes, type InferCreationAttributes, CreationOptional } from 'sequelize';
 import { sequelize } from '@/infrastructure/persistence/connection';
 
 class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferCreationAttributes<WorkScheduleModel>> {
@@ -10,8 +10,8 @@ class WorkScheduleModel extends Model<InferAttributes<WorkScheduleModel>, InferC
     declare month: number;
     declare day: number;
     declare status: 'assigned' | 'completed' | 'absent';
-    declare createdAt?: Date;
-    declare updatedAt?: Date;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
 }
 
 WorkScheduleModel.init({
@@ -22,13 +22,14 @@ WorkScheduleModel.init({
     year: { type: DataTypes.INTEGER, allowNull: false },
     month: { type: DataTypes.INTEGER, allowNull: false },
     day: { type: DataTypes.INTEGER, allowNull: false },
-    status: { type: DataTypes.ENUM('assigned', 'completed', 'absent'), allowNull: false, defaultValue: 'assigned' }
+    status: { type: DataTypes.ENUM('assigned', 'completed', 'absent'), allowNull: false, defaultValue: 'assigned' },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
 },
     {
         sequelize,
         modelName: 'WorkSchedule',
-        tableName: 'HORARIOS_TRABAJO',
-        timestamps: true,
+        tableName: 'HORARIOS_TRABAJO'
     }
 );
 

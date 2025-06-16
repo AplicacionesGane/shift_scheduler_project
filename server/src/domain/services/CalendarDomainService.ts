@@ -48,7 +48,7 @@ export class CalendarDomainService implements ICalendarDomainService {
     isWeekend = (year: number, month: number, day: number): boolean => {
         const date = new Date(year, month - 1, day);
         const dayOfWeek = date.getDay();
-        return dayOfWeek === 0 || dayOfWeek === 6; // Domingo = 0, Sábado = 6
+        return dayOfWeek === 0 // || dayOfWeek === 6; // Domingo = 0, Sábado = 6 // SOLO Domingo
     }
 
     isFixedHoliday = (month: number, day: number): { isHoliday: boolean; description?: string } => {

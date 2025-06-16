@@ -14,7 +14,10 @@ export interface DayCalendar {
 
 export interface MonthData {
   years: number[];
-  months: { numero: number, nameMonth: string }[]
+  months: {
+    number: number;
+    name: string
+  }[]
 }
 
 export interface WorkSchedule {
