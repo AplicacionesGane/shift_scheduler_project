@@ -15,7 +15,7 @@ export class WorkScheduleValue implements WorkSchedule {
 
     constructor(workSchedule: WorkSchedule) {
         // validate year
-        if (workSchedule.year < 1900 || workSchedule.year > 2100) {
+        if (workSchedule.year < 2024 || workSchedule.year > 2100) {
             throw new Error('Invalid year to assign work schedule');
         }
 
